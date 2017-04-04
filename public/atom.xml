@@ -1,0 +1,346 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>Hexo</title>
+  
+  <link href="/atom.xml" rel="self"/>
+  
+  <link href="https://tenny-peng.github.io/"/>
+  <updated>2017-04-04T08:16:02.111Z</updated>
+  <id>https://tenny-peng.github.io/</id>
+  
+  <author>
+    <name>John Doe</name>
+    
+  </author>
+  
+  <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>testpic</title>
+    <link href="https://tenny-peng.github.io/2017/04/04/testpic/"/>
+    <id>https://tenny-peng.github.io/2017/04/04/testpic/</id>
+    <published>2017-04-04T08:16:02.000Z</published>
+    <updated>2017-04-04T08:16:02.111Z</updated>
+    
+    <summary type="html">
+    
+    </summary>
+    
+    
+  </entry>
+  
+  <entry>
+    <title>修复TortoiseGit图标不显示</title>
+    <link href="https://tenny-peng.github.io/2017/04/04/%E4%BF%AE%E5%A4%8DTortoiseGit%E5%9B%BE%E6%A0%87%E4%B8%8D%E6%98%BE%E7%A4%BA/"/>
+    <id>https://tenny-peng.github.io/2017/04/04/修复TortoiseGit图标不显示/</id>
+    <published>2017-04-04T03:35:14.000Z</published>
+    <updated>2017-04-04T04:02:13.575Z</updated>
+    
+    <content type="html"><![CDATA[<ol>
+<li><p>win + r 打开运行，输入regedit.exe打开注册表</p>
+</li>
+<li><p>找到HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Explorer</p>
+</li>
+<li><p>修改符串值 “Max Cached Icons” (如没有则新建)值为 “10000”(切换到十进制)。<br><img src="/2017/04/04/修复TortoiseGit图标不显示/20170404114101.png" alt="注册表"></p>
+</li>
+<li><p>Ctrl + Alt + Del 打开任务管理器,找到explorer.explorer<br><img src="/2017/04/04/修复TortoiseGit图标不显示/20170404114741.png" alt="任务管理器"></p>
+</li>
+<li><p>右键选中explorer.exe，在弹出选项中选择”结束进程”,这个时候会发现电脑底部状态栏没有了，不用担心。</p>
+</li>
+<li><p>任务管理器上方的”文件”选项，点击”新建任务(运行)”，输入explorer.exe，确定即可。<br><img src="/2017/04/04/修复TortoiseGit图标不显示/20170404115205.png" alt="重启explorer"></p>
+</li>
+</ol>
+<p>由于Windows Explorer Shell 支持的 Overlay Icon 最多 15 个，Windows 自身使用了 4 个，只剩 11 个可扩展使用。我们在这里调节了它的最大图标数。<br>explorer.exe是Windows程序管理器或者文件资源管理器，它用于管理Windows图形壳，包括桌面和文件管理，重启explorer.exe就可以看到我们的修改了。</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;ol&gt;
+&lt;li&gt;&lt;p&gt;win + r 打开运行，输入regedit.exe打开注册表&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;找到HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Explorer&lt;/p&gt;
+&lt;/l
+    
+    </summary>
+    
+      <category term="TortoiseGit" scheme="https://tenny-peng.github.io/categories/TortoiseGit/"/>
+    
+    
+      <category term="TortoiseGit" scheme="https://tenny-peng.github.io/tags/TortoiseGit/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>MarkDown设置字体颜色</title>
+    <link href="https://tenny-peng.github.io/2017/04/03/MarkDown%E5%AD%97%E4%BD%93%E9%A2%9C%E8%89%B2/"/>
+    <id>https://tenny-peng.github.io/2017/04/03/MarkDown字体颜色/</id>
+    <published>2017-04-03T13:15:12.000Z</published>
+    <updated>2017-04-03T13:20:28.589Z</updated>
+    
+    <content type="html"><![CDATA[<p>记录一下如何设置字体颜色和大小<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">&lt;font color=red size=5&gt;gray&lt;/font&gt;</div><div class="line">&lt;font color=&quot;#4590a3&quot; size=&quot;6px&quot;&gt;文字&lt;/font&gt;</div></pre></td></tr></table></figure></p>
+<p>效果如下：</p>
+<font color="red" size="5">red</font><br><font color="#4590a3" size="6px">文字</font>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;记录一下如何设置字体颜色和大小&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;
+    
+    </summary>
+    
+      <category term="markdown" scheme="https://tenny-peng.github.io/categories/markdown/"/>
+    
+    
+      <category term="markdown，字体颜色" scheme="https://tenny-peng.github.io/tags/markdown%EF%BC%8C%E5%AD%97%E4%BD%93%E9%A2%9C%E8%89%B2/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>hexo引用本地图片</title>
+    <link href="https://tenny-peng.github.io/2017/04/03/MarkDown%E5%BC%95%E7%94%A8%E6%9C%AC%E5%9C%B0%E5%9B%BE%E7%89%87/"/>
+    <id>https://tenny-peng.github.io/2017/04/03/MarkDown引用本地图片/</id>
+    <published>2017-04-03T12:03:30.000Z</published>
+    <updated>2017-04-04T08:47:29.276Z</updated>
+    
+    <content type="html"><![CDATA[<h3 id="markdown文章里引用图片有两种方式。"><a href="#markdown文章里引用图片有两种方式。" class="headerlink" title="markdown文章里引用图片有两种方式。"></a>markdown文章里引用图片有两种方式。</h3><p>一种是直接引用互联网上的图片，使用绝对路径  <a href="http://xxx.com/xxx.jpg" target="_blank" rel="external">http://xxx.com/xxx.jpg</a></p>
+<p>一种是使用本地图片。</p>
+<p>因为最后要发布到网上，所以引用本地图片路径必须是相对路径xxx/xxx.png</p>
+<h3 id="这里讲如何引用本地图片。"><a href="#这里讲如何引用本地图片。" class="headerlink" title="这里讲如何引用本地图片。"></a>这里讲如何引用本地图片。</h3><ol>
+<li><p>首先在站点_config.yml 中找到”post_asset_folder”属性，将其设置为”true”。Hexo 提供了一种更方便管理 Asset 的设定：post_asset_folder。当设置post_asset_folder为true参数后，在建立文件时，Hexo会自动建立一个与文章同名的文件夹，您可以把与该文章相关的所有资源都放到那个文件夹，如此一来，您便可以更方便的使用资源。</p>
+</li>
+<li><p>启动cmd,切换到hexo的目录下执行</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">npm install https://github.com/CodeFalling/hexo-asset-image --save</div></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>等待一段时即可。</p>
+<ol>
+<li><p>安装完成后用hexo新建文章的时候_posts目录下面会多出一个和文章同名的文件夹。图片就可以放在该文件夹下面使用。<br><img src="/2017/04/03/MarkDown引用本地图片/20170404161617.png" alt="hexo new1"><br><img src="/2017/04/03/MarkDown引用本地图片/20170404161920.png" alt="hexo new2"></p>
+</li>
+<li><p>把你要引用的图片放在同名目录下,如下引用即可。</p>
+</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">![xxx](testpic/xxxxxx.png)</div></pre></td></tr></table></figure>
+<p>个人感觉也可以不装这个插件，自己手动建立同名文件夹也可以的。但是装了还是方便，比较hexo新建文章能初始化一些信息。</p>
+<p>再说下本人踩过的坑。在source目录下建立images文件夹存放图片，然后通过../images/xxx.png引用，感觉是没什么问题的，实际在本地也没问题。但是上传到github就不对了。github上去找寻的路径类似<br><a href="https://tenny-peng.github.io/2017/04/04/images/xxx.png。">https://tenny-peng.github.io/2017/04/04/images/xxx.png。</a><br>很明显这是找不到的，因为发布后2017/04/04下只有文章，没有其他文件或文件夹。也试过在_posts下建立images,通过images/xxx.png引用，结果是一样的。</p>
+<p>然后建立了同名文件夹，到github上查看发布后的文件才发现，对于每个md文件，生成一个同名的文件夹，里面有一个index.html文件是md文件转化的内容，我们当初自建的同名文件夹下的图片也在该文件夹下，例如，在github上，对于testpic.md,生成一个testpic文件夹，里面有一个index.html,其内容就是我们得testpic.md里编写的内容，而我们当时正好建立了同名的文件夹来存放图片，此时，这些图片也到了github下的同名文件夹。如此一来，引用就没有问题了。</p>
+<p><img src="/2017/04/03/MarkDown引用本地图片/20170404164607.png" alt="本地目录"></p>
+<p><img src="/2017/04/03/MarkDown引用本地图片/20170404164402.png" alt="github目录"></p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h3 id=&quot;markdown文章里引用图片有两种方式。&quot;&gt;&lt;a href=&quot;#markdown文章里引用图片有两种方式。&quot; class=&quot;headerlink&quot; title=&quot;markdown文章里引用图片有两种方式。&quot;&gt;&lt;/a&gt;markdown文章里引用图片有两种方式。&lt;/
+    
+    </summary>
+    
+      <category term="markdown" scheme="https://tenny-peng.github.io/categories/markdown/"/>
+    
+    
+      <category term="markdown" scheme="https://tenny-peng.github.io/tags/markdown/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Git简单教程</title>
+    <link href="https://tenny-peng.github.io/2017/04/03/Git%E7%AE%80%E5%8D%95%E6%95%99%E7%A8%8B/"/>
+    <id>https://tenny-peng.github.io/2017/04/03/Git简单教程/</id>
+    <published>2017-04-03T05:45:13.000Z</published>
+    <updated>2017-04-03T15:05:20.086Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>Git是一款免费、开源的分布式版本控制系统，用于敏捷高效地处理任何或小或大的项目,</p>
+<p>可以有效、高速的处理从很小到非常大的项目版本管理。</p>
+<h1 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h1><p>由于本人是Windows平台，所以这里安装的是Windows平台下的工具。</p>
+<p>点击<a href="https://git-scm.com/download/win" target="_blank" rel="external">https://git-scm.com/download/win</a>下载</p>
+<p>如果网速太慢可以百度搜索“git下载”。</p>
+<p>下载完成之后一路next就可以了，  </p>
+<p>安装完成后，开始菜单找到”git”-&gt;”Git Bash”，</p>
+<p>在命令行输入<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">git --version</div></pre></td></tr></table></figure></p>
+<p>看到类似如下结果，说明我们安装成功了。</p>
+<p><img src="/2017/04/03/Git简单教程/20170403201939.png" alt="git_bash_img"></p>
+<p>安装完成后，还需要一点设置，在打开的git bash命令行中输入<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">$ git config --global user.name &quot;Your Name&quot;</div><div class="line">$ git config --global user.email &quot;email@example.com&quot;</div></pre></td></tr></table></figure></p>
+<p><strong>注意把上面改成自己的名字和邮箱地址</strong></p>
+<p>git config命令的–global参数，表示你这台机器上所有的Git仓库都会使用这个配置，</p>
+<p>当然也可以对某个仓库指定不同的用户名和Email地址。</p>
+<p>因为Git是分布式版本控制系统，所以，每个机器都必须自报家门：你的名字和Email地址。</p>
+<h1 id="使用github"><a href="#使用github" class="headerlink" title="使用github"></a>使用github</h1><p>我们希望项目不只是在本地，只有有网，哪里都可以获取自己的项目，<br>GitHub 正是这样一个面向开源及私有软件项目的托管平台。<br>我们可以把自己的项目放在这个平台上，可以和其他人维护项目。</p>
+<p>后面会讲git的基本操作，你也可以直接到后面查看。作为一般流程，这里让我们先注册一个github账号</p>
+<p>进入<a href="https://github.com/" target="_blank" rel="external">github</a>网站,点击sign up</p>
+<p><img src="/2017/04/03/Git简单教程/20170403203407.png" alt="注册github"></p>
+<p>填写信息后点击”create an account” 按钮</p>
+<p><img src="/2017/04/03/Git简单教程/20170403203655.png" alt="注册github"></p>
+<p>之后进入到我们的首页</p>
+<p><img src="/2017/04/03/Git简单教程/20170403204148.png" alt="github首页"></p>
+<p>这样我们已经成功拥有了一个github账号，让我们正式开始吧~</p>
+<p>简单说下仓库的概念，仓库的英文名是repository，你可以简单理解成一个目录，<br>这个目录里面的所有文件都可以被Git管理起来，每个文件的修改、删除，Git都能跟踪，<br>以便任何时刻都可以追踪历史，或者在将来某个时刻可以“还原”。</p>
+<p>点击上面的+号，新建一个仓库<br><img src="/2017/04/03/Git简单教程/20170403204148.png" alt="github首页"></p>
+<p>输入我们的仓库名称后，点击下面”create repository”按钮即可创建一个仓库<br><img src="/2017/04/03/Git简单教程/0170403204526.png" alt="仓库信息"></p>
+<p>我们可以看到这个仓库是空的，什么都没有。<br><img src="/2017/04/03/Git简单教程/20170403205231.png" alt="空仓库"></p>
+<p>接下来，我们回到本地git上。</p>
+<h1 id="克隆仓库"><a href="#克隆仓库" class="headerlink" title="克隆仓库"></a>克隆仓库</h1><p>回到git bash命令窗口</p>
+<p>输入<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">cd e:</div></pre></td></tr></table></figure></p>
+<p>切换目录，执行<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">git clone git@github.com:tenny-peng/test.git</div></pre></td></tr></table></figure></p>
+<p>稍等一会，就可将github上的项目克隆到本地</p>
+<p><img src="/2017/04/03/Git简单教程/20170403212928.png" alt="本地仓库"></p>
+<p>这里我选的e盘根目录，你可以自己修改，<strong>注意：选择的目录下不可以有仓库同名目录</strong><br>如我的e盘下不能有test这个目录，不然在克隆时会报错。</p>
+<p><img src="/2017/04/03/Git简单教程/20170403210357.png" alt="克隆仓库"><br>这里有一个警告，说我们的仓库是空的，不用管它，我们马上会添加文件。</p>
+<h1 id="添加文件"><a href="#添加文件" class="headerlink" title="添加文件"></a>添加文件</h1><font color="red" size="5">使用Windows的童鞋要特别注意：</font>
+
+<p>千万不要使用Windows自带的记事本编辑任何文本文件。原因是Microsoft开发记事本的团队使用了<br>一个非常弱智的行为来保存UTF-8编码的文件，他们自作聪明地在每个文件开头添加了0xefbbbf<br>（十六进制）的字符，你会遇到很多不可思议的问题，比如，网页第一行可能会显示一个“?”，<br>明明正确的程序一编译就报语法错误，等等，都是由记事本的弱智行为带来的。建议你下载<br>Notepad++代替记事本，不但功能强大，而且免费！记得把notepad++的默认编码设置为UTF-8<br>without BOM即可。</p>
+<p>在仓库test文件目录下，我们先编写一个readme.txt文件，内容如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">Git is a version control system.</div><div class="line">Git is free software.</div></pre></td></tr></table></figure></p>
+<p><img src="/2017/04/03/Git简单教程/20170403213141.png" alt="新建文件"></p>
+<p>这里我们可以看到test目录下有一个隐藏的.git目录(看不到可自行百度“windows查看隐藏文件方法”)，这个就说明此目录是由git管理的仓库了，如果删除了这个隐藏的目录，那个git也就不认识这个目录了，也不能对此目录下的文件进行管理了。</p>
+<p>回到命令行，输入<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">git add readme.txt</div></pre></td></tr></table></figure></p>
+<p><img src="/2017/04/03/Git简单教程/20170403213613.png" alt="添加文件"></p>
+<p>什么反馈信息也没有？那就对了，Unix的哲学是“没有消息就是好消息”，说明添加成功。</p>
+<p>使用<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">git status</div></pre></td></tr></table></figure></p>
+<p>可查看当前仓库状态</p>
+<p><img src="/2017/04/03/Git简单教程/20170403213822.png" alt="添加状态"></p>
+<p>我们发现提示有新文件，但是这样还不够。</p>
+<p>我们继续输入<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">git commit -m &quot;add readme.txt&quot;</div></pre></td></tr></table></figure></p>
+<p>这样才把文件提交到仓库，再次输入”git status”查看状态</p>
+<p><img src="/2017/04/03/Git简单教程/20170403214113.png" alt="提交状态"></p>
+<p>简单解释一下git commit命令，-m后面输入的是本次提交的说明，可以输入任意内容，当然最好是有意义的，这样你就能从历史记录里方便地找到改动记录。</p>
+<p>git commit命令执行成功后会告诉你，1个文件被改动（我们新添加的readme.txt文件），插入了两行内容（readme.txt有两行内容）。</p>
+<h1 id="推送"><a href="#推送" class="headerlink" title="推送"></a>推送</h1><p>这里我就在仓库里新增了一个文件，当然还会有修改，删除操作。其实这样就可以管理自己的项目了。但是，我们似乎忘记了github。对，我们需要的是随时随处可获取，所以我们需要把本地仓库的内容同步到github这个托管平台。</p>
+<p>当你从远程仓库克隆时，实际上Git自动把本地的master分支(分支后面再讲，简单理解为仓库的多个版本，默认一个主分支)和远程的master分支对应起来了，并且，远程仓库的默认名称是origin。</p>
+<p>要查看远程库的信息，输入<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">git remote</div></pre></td></tr></table></figure></p>
+<p>或<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">git remote -v</div></pre></td></tr></table></figure></p>
+<p>获取更详细信息</p>
+<p><img src="/2017/04/03/Git简单教程/20170403214855.png" alt="远程信息"></p>
+<p>上面显示了可以抓取和推送的origin的地址。如果没有推送权限，就看不到push的地址。</p>
+<p>接下来我们把本地改动(这里新增了一个文件，对于git，新增，修改，删除，都属于改动)推送到远程仓库。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">git push origin master</div></pre></td></tr></table></figure></p>
+<p><img src="/2017/04/03/Git简单教程/20170403215328.png" alt="推送分支"></p>
+<p>刷新浏览器中我们的github主页，可以看到，readme.txt文件已经同步到远程仓库了。<br><img src="/2017/04/03/Git简单教程/20170403215427.png" alt="查看远程分支"></p>
+<font size="5">以上我们就使用git创建了自己的仓库，并将其同步到远程服务器上，以便我们在其它地方，或其他人获取。</font>
+
+<p><br><br>参考：</p>
+<p><a href="http://www.liaoxuefeng.com/wiki/0013739516305929606dd18361248578c67b8067c8c017b000" target="_blank" rel="external">廖雪峰的git教程</a></p>
+<p><a href="http://www.baike.com/wiki/GIT" target="_blank" rel="external">git互动百科</a></p>
+<p><a href="http://www.baike.com/wiki/github" target="_blank" rel="external">github互动百科</a></p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h1 id=&quot;简介&quot;&gt;&lt;a href=&quot;#简介&quot; class=&quot;headerlink&quot; title=&quot;简介&quot;&gt;&lt;/a&gt;简介&lt;/h1&gt;&lt;p&gt;Git是一款免费、开源的分布式版本控制系统，用于敏捷高效地处理任何或小或大的项目,&lt;/p&gt;
+&lt;p&gt;可以有效、高速的处理从很小到非常大的项目版
+    
+    </summary>
+    
+      <category term="git" scheme="https://tenny-peng.github.io/categories/git/"/>
+    
+    
+      <category term="git" scheme="https://tenny-peng.github.io/tags/git/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Markdown基础语法</title>
+    <link href="https://tenny-peng.github.io/2017/04/03/MarkDown%E5%9F%BA%E7%A1%80%E8%AF%AD%E6%B3%95/"/>
+    <id>https://tenny-peng.github.io/2017/04/03/MarkDown基础语法/</id>
+    <published>2017-04-03T02:21:15.000Z</published>
+    <updated>2017-04-03T13:14:56.524Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="标准mrakdown语法"><a href="#标准mrakdown语法" class="headerlink" title="标准mrakdown语法"></a>标准mrakdown语法</h1><h2 id="加粗和斜体"><a href="#加粗和斜体" class="headerlink" title="加粗和斜体"></a>加粗和斜体</h2><h3 id="字体加粗以两个-或两个-开头结尾"><a href="#字体加粗以两个-或两个-开头结尾" class="headerlink" title="字体加粗以两个*或两个_开头结尾"></a>字体加粗以两个*或两个_开头结尾</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">__重要的事情说三遍！！！__   **重要的事情说三遍！！！**</div></pre></td></tr></table></figure>
+<p>效果如下：</p>
+<p><strong>重要的事情说三遍！！！</strong></p>
+<h3 id="字体倾斜以一个-或-开头结尾"><a href="#字体倾斜以一个-或-开头结尾" class="headerlink" title="字体倾斜以一个*或_开头结尾"></a>字体倾斜以一个*或_开头结尾</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">_一段斜体文字_   *一段斜体文字*</div></pre></td></tr></table></figure>
+<p>效果如下：</p>
+<p> <em>一段斜体文字</em></p>
+<h2 id="链接和邮件"><a href="#链接和邮件" class="headerlink" title="链接和邮件"></a>链接和邮件</h2><h3 id="链接："><a href="#链接：" class="headerlink" title="链接："></a>链接：</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">bla bla bla [example](http://url.com/ &quot;Title&quot;)</div><div class="line">这是我们常用的网站: [百度一下](www.baidu.com &quot;百度一下&quot;)</div></pre></td></tr></table></figure>
+<p>效果如下：</p>
+<p>这是我们常用的网站: <a href="www.baidu.com" title="百度一下">baidu</a></p>
+<p>也可以定义一个id来对应链接地址<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">bla bla bla [example][id]. Then, anywhere else in the doc, define the link:</div><div class="line">[id]: http://example.com/  &quot;Title&quot;</div><div class="line"></div><div class="line">这是我们常用的网站: [baidu][baiduId]</div><div class="line">[baiduId]: www.baidu.com &quot;百度一下&quot;</div></pre></td></tr></table></figure></p>
+<p>效果如下：</p>
+<p>这是我的<a href="https://tenny-peng.github.io" title="tenny&#39;s blog">博客</a>，欢迎访问。</p>
+<h3 id="邮件："><a href="#邮件：" class="headerlink" title="邮件："></a>邮件：</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">An email &lt;example@example.com&gt; link.</div><div class="line">这是我的邮箱&lt;mpengtaoqi@163.com&gt;。</div></pre></td></tr></table></figure>
+<p>效果如下：</p>
+<p>这是我的邮箱<a href="&#109;&#x61;&#x69;&#x6c;&#116;&#111;&#x3a;&#109;&#x70;&#x65;&#x6e;&#103;&#x74;&#x61;&#111;&#113;&#x69;&#x40;&#49;&#x36;&#51;&#x2e;&#x63;&#x6f;&#109;">&#109;&#x70;&#x65;&#x6e;&#103;&#x74;&#x61;&#111;&#113;&#x69;&#x40;&#49;&#x36;&#51;&#x2e;&#x63;&#x6f;&#109;</a>。</p>
+<h2 id="图片"><a href="#图片" class="headerlink" title="图片"></a>图片</h2><p>行内引用 (标题可选):<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">![alt text](/path/img.jpg &quot;Title&quot;)</div><div class="line">这里出现一个引用的图片![图片替代文字](https://tenny-peng.github.io/images/avatar.jpg &quot;偷得浮生半日闲&quot;)</div></pre></td></tr></table></figure></p>
+<p>效果如下：</p>
+<p>这里出现一个引用的图片<img src="https://tenny-peng.github.io/images/avatar.jpg" alt="图片替代文字" title="偷得浮生半日闲"></p>
+<p>使用id引用图片链接：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">![alt text][id]</div><div class="line">[id]: /url/to/img.jpg &quot;Title&quot;</div><div class="line"></div><div class="line">使用id引用图片链接![图片替代文字][img_id]</div><div class="line">[img_id](https://tenny-peng.github.io/images/avatar.jpg &quot;偷得浮生半日闲&quot;)</div></pre></td></tr></table></figure></p>
+<p>效果如下：</p>
+<p>使用id引用图片链接<img src="https://tenny-peng.github.io/images/avatar.jpg" alt="图片替代文字" title="偷得浮生半日闲"></p>
+<h2 id="标题"><a href="#标题" class="headerlink" title="标题"></a>标题</h2><h3 id="底线形式"><a href="#底线形式" class="headerlink" title="底线形式:"></a>底线形式:</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">标题 1</div><div class="line">========</div><div class="line"></div><div class="line">标题 2</div><div class="line">--------</div></pre></td></tr></table></figure>
+<p>效果如下：</p>
+<h1 id="标题-1"><a href="#标题-1" class="headerlink" title="标题 1"></a>标题 1</h1><h2 id="标题-2"><a href="#标题-2" class="headerlink" title="标题 2"></a>标题 2</h2><h3 id="模式-末尾的-可选"><a href="#模式-末尾的-可选" class="headerlink" title="#模式 (末尾的#可选):"></a>#模式 (末尾的#可选):</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"># 标题 1 #</div><div class="line"></div><div class="line">## 标题 2 ##</div><div class="line"></div><div class="line">###### 标题 6</div></pre></td></tr></table></figure>
+<p>效果如下：</p>
+<h1 id="标题-1-1"><a href="#标题-1-1" class="headerlink" title="标题 1"></a>标题 1</h1><h2 id="标题-2-1"><a href="#标题-2-1" class="headerlink" title="标题 2"></a>标题 2</h2><h6 id="标题-6"><a href="#标题-6" class="headerlink" title="标题 6"></a>标题 6</h6><h2 id="列表"><a href="#列表" class="headerlink" title="列表"></a>列表</h2><h3 id="有序的-不带段落"><a href="#有序的-不带段落" class="headerlink" title="有序的, 不带段落:"></a>有序的, 不带段落:</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">1.  Git</div><div class="line">2.  Hexo</div><div class="line">3.  MarkDown</div></pre></td></tr></table></figure>
+<p>效果如下：</p>
+<ol>
+<li>Git</li>
+<li>Hexo</li>
+<li>MarkDown</li>
+</ol>
+<h3 id="无序的-带段落"><a href="#无序的-带段落" class="headerlink" title="无序的, 带段落:"></a>无序的, 带段落:</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">*   一个条目.</div><div class="line"></div><div class="line">    巴拉巴拉拉，这里是段落文字.</div><div class="line"></div><div class="line">*   其他条目</div></pre></td></tr></table></figure>
+<p>效果如下：</p>
+<ul>
+<li><p>一个条目.</p>
+<p>巴拉巴拉巴拉，这里是段落文字.</p>
+</li>
+<li><p>其他条目</p>
+</li>
+</ul>
+<h3 id="你可以嵌套使用它们："><a href="#你可以嵌套使用它们：" class="headerlink" title="你可以嵌套使用它们："></a>你可以嵌套使用它们：</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">*   Work</div><div class="line">    * java</div><div class="line">*   Blog</div><div class="line">    1.  github</div><div class="line">    2.  atom</div><div class="line">        * markdown</div><div class="line">    3. hexo</div><div class="line">*   learn</div></pre></td></tr></table></figure>
+<p>效果如下：</p>
+<ul>
+<li>Work<ul>
+<li>java</li>
+</ul>
+</li>
+<li>Blog<ol>
+<li>github</li>
+<li>atom<ul>
+<li>markdown</li>
+</ul>
+</li>
+<li>hexo</li>
+</ol>
+</li>
+<li>learn</li>
+</ul>
+<h2 id="区块引用"><a href="#区块引用" class="headerlink" title="区块引用"></a>区块引用</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">&gt; 类似邮件的引用方式</div><div class="line">&gt; 在断好的行前加上`&gt;`</div><div class="line"></div><div class="line">&gt; &gt; 也可以嵌套使用</div><div class="line"></div><div class="line">&gt; #### 引用标题</div><div class="line">&gt;</div><div class="line">&gt; * 也可以是一个列表</div><div class="line">&gt; * 等等</div></pre></td></tr></table></figure>
+<p>效果如下：</p>
+<blockquote>
+<p>类似邮件的引用方式<br>在断好的行前加上<code>&gt;</code></p>
+<blockquote>
+<p>也可以嵌套使用</p>
+</blockquote>
+<h4 id="引用标题"><a href="#引用标题" class="headerlink" title="引用标题"></a>引用标题</h4><ul>
+<li>也可以是一个列表</li>
+<li>等等</li>
+</ul>
+</blockquote>
+<h3 id="内联代码"><a href="#内联代码" class="headerlink" title="内联代码"></a>内联代码</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">`&lt;some code&gt;` 使用引号和反引号标记行内代码片段。</div><div class="line"></div><div class="line">如果要在代码区段内插入反引号，可以用多个反引号来开启和结束代码区段。</div><div class="line"></div><div class="line">例如 `` `this` ``.</div></pre></td></tr></table></figure>
+<p>效果如下：</p>
+<p><code>&lt;some code&gt;</code> 使用引号和反引号标记行内代码片段。</p>
+<p>如果要在代码区段内插入反引号，可以用多个反引号来开启和结束代码区段。</p>
+<p>例如 <code>`this` </code>.</p>
+<h3 id="代码块"><a href="#代码块" class="headerlink" title="代码块"></a>代码块</h3><p>在句段的行首插入1个tab 或 4个空格，则表示代码块。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">这是一段普通的文字。</div><div class="line"></div><div class="line">  这一段代码块。</div></pre></td></tr></table></figure></p>
+<h2 id="分隔线"><a href="#分隔线" class="headerlink" title="分隔线"></a>分隔线</h2><p>用三个以上的星号或减号或底线来建立一个水平分隔线。</p>
+<p>行内不能有其他东西，但你可以在星号或是减号中间插入空格。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">---</div><div class="line"></div><div class="line">* * *</div><div class="line"></div><div class="line">- - - -</div></pre></td></tr></table></figure></p>
+<p>效果如下：</p>
+<hr>
+<hr>
+<hr>
+<h2 id="换行"><a href="#换行" class="headerlink" title="换行"></a>换行</h2><p>在一行的结尾处加上2个或2个以上的空格<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">Roses are red,   </div><div class="line">Violets are blue.</div></pre></td></tr></table></figure></p>
+<p>效果如下：</p>
+<p>Roses are red,<br>Violets are blue.</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h1 id=&quot;标准mrakdown语法&quot;&gt;&lt;a href=&quot;#标准mrakdown语法&quot; class=&quot;headerlink&quot; title=&quot;标准mrakdown语法&quot;&gt;&lt;/a&gt;标准mrakdown语法&lt;/h1&gt;&lt;h2 id=&quot;加粗和斜体&quot;&gt;&lt;a href=&quot;#加粗和斜体&quot; c
+    
+    </summary>
+    
+      <category term="markdown" scheme="https://tenny-peng.github.io/categories/markdown/"/>
+    
+    
+      <category term="markdown" scheme="https://tenny-peng.github.io/tags/markdown/"/>
+    
+      <category term="语法" scheme="https://tenny-peng.github.io/tags/%E8%AF%AD%E6%B3%95/"/>
+    
+  </entry>
+  
+</feed>

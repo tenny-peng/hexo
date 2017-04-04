@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<search>
+  
+    
+    <entry>
+      <title><![CDATA[testpic]]></title>
+      <url>%2F2017%2F04%2F04%2Ftestpic%2F</url>
+      <content type="text"></content>
+    </entry>
+
+    
+    <entry>
+      <title><![CDATA[修复TortoiseGit图标不显示]]></title>
+      <url>%2F2017%2F04%2F04%2F%E4%BF%AE%E5%A4%8DTortoiseGit%E5%9B%BE%E6%A0%87%E4%B8%8D%E6%98%BE%E7%A4%BA%2F</url>
+      <content type="text"><![CDATA[win + r 打开运行，输入regedit.exe打开注册表 找到HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Explorer 修改符串值 “Max Cached Icons” (如没有则新建)值为 “10000”(切换到十进制)。 Ctrl + Alt + Del 打开任务管理器,找到explorer.explorer 右键选中explorer.exe，在弹出选项中选择”结束进程”,这个时候会发现电脑底部状态栏没有了，不用担心。 任务管理器上方的”文件”选项，点击”新建任务(运行)”，输入explorer.exe，确定即可。 由于Windows Explorer Shell 支持的 Overlay Icon 最多 15 个，Windows 自身使用了 4 个，只剩 11 个可扩展使用。我们在这里调节了它的最大图标数。explorer.exe是Windows程序管理器或者文件资源管理器，它用于管理Windows图形壳，包括桌面和文件管理，重启explorer.exe就可以看到我们的修改了。]]></content>
+    </entry>
+
+    
+    <entry>
+      <title><![CDATA[MarkDown设置字体颜色]]></title>
+      <url>%2F2017%2F04%2F03%2FMarkDown%E5%AD%97%E4%BD%93%E9%A2%9C%E8%89%B2%2F</url>
+      <content type="text"><![CDATA[记录一下如何设置字体颜色和大小12&lt;font color=red size=5&gt;gray&lt;/font&gt;&lt;font color=&quot;#4590a3&quot; size=&quot;6px&quot;&gt;文字&lt;/font&gt; 效果如下： red文字]]></content>
+    </entry>
+
+    
+    <entry>
+      <title><![CDATA[hexo引用本地图片]]></title>
+      <url>%2F2017%2F04%2F03%2FMarkDown%E5%BC%95%E7%94%A8%E6%9C%AC%E5%9C%B0%E5%9B%BE%E7%89%87%2F</url>
+      <content type="text"><![CDATA[markdown文章里引用图片有两种方式。一种是直接引用互联网上的图片，使用绝对路径 http://xxx.com/xxx.jpg 一种是使用本地图片。 因为最后要发布到网上，所以引用本地图片路径必须是相对路径xxx/xxx.png 这里讲如何引用本地图片。 首先在站点_config.yml 中找到”post_asset_folder”属性，将其设置为”true”。Hexo 提供了一种更方便管理 Asset 的设定：post_asset_folder。当设置post_asset_folder为true参数后，在建立文件时，Hexo会自动建立一个与文章同名的文件夹，您可以把与该文章相关的所有资源都放到那个文件夹，如此一来，您便可以更方便的使用资源。 启动cmd,切换到hexo的目录下执行 1npm install https://github.com/CodeFalling/hexo-asset-image --save 等待一段时即可。 安装完成后用hexo新建文章的时候_posts目录下面会多出一个和文章同名的文件夹。图片就可以放在该文件夹下面使用。 把你要引用的图片放在同名目录下,如下引用即可。 1![xxx](testpic/xxxxxx.png) 个人感觉也可以不装这个插件，自己手动建立同名文件夹也可以的。但是装了还是方便，比较hexo新建文章能初始化一些信息。 再说下本人踩过的坑。在source目录下建立images文件夹存放图片，然后通过../images/xxx.png引用，感觉是没什么问题的，实际在本地也没问题。但是上传到github就不对了。github上去找寻的路径类似https://tenny-peng.github.io/2017/04/04/images/xxx.png。很明显这是找不到的，因为发布后2017/04/04下只有文章，没有其他文件或文件夹。也试过在_posts下建立images,通过images/xxx.png引用，结果是一样的。 然后建立了同名文件夹，到github上查看发布后的文件才发现，对于每个md文件，生成一个同名的文件夹，里面有一个index.html文件是md文件转化的内容，我们当初自建的同名文件夹下的图片也在该文件夹下，例如，在github上，对于testpic.md,生成一个testpic文件夹，里面有一个index.html,其内容就是我们得testpic.md里编写的内容，而我们当时正好建立了同名的文件夹来存放图片，此时，这些图片也到了github下的同名文件夹。如此一来，引用就没有问题了。]]></content>
+    </entry>
+
+    
+    <entry>
+      <title><![CDATA[Git简单教程]]></title>
+      <url>%2F2017%2F04%2F03%2FGit%E7%AE%80%E5%8D%95%E6%95%99%E7%A8%8B%2F</url>
+      <content type="text"><![CDATA[简介Git是一款免费、开源的分布式版本控制系统，用于敏捷高效地处理任何或小或大的项目, 可以有效、高速的处理从很小到非常大的项目版本管理。 安装由于本人是Windows平台，所以这里安装的是Windows平台下的工具。 点击https://git-scm.com/download/win下载 如果网速太慢可以百度搜索“git下载”。 下载完成之后一路next就可以了， 安装完成后，开始菜单找到”git”-&gt;”Git Bash”， 在命令行输入1git --version 看到类似如下结果，说明我们安装成功了。 安装完成后，还需要一点设置，在打开的git bash命令行中输入12$ git config --global user.name &quot;Your Name&quot;$ git config --global user.email &quot;email@example.com&quot; 注意把上面改成自己的名字和邮箱地址 git config命令的–global参数，表示你这台机器上所有的Git仓库都会使用这个配置， 当然也可以对某个仓库指定不同的用户名和Email地址。 因为Git是分布式版本控制系统，所以，每个机器都必须自报家门：你的名字和Email地址。 使用github我们希望项目不只是在本地，只有有网，哪里都可以获取自己的项目，GitHub 正是这样一个面向开源及私有软件项目的托管平台。我们可以把自己的项目放在这个平台上，可以和其他人维护项目。 后面会讲git的基本操作，你也可以直接到后面查看。作为一般流程，这里让我们先注册一个github账号 进入github网站,点击sign up 填写信息后点击”create an account” 按钮 之后进入到我们的首页 这样我们已经成功拥有了一个github账号，让我们正式开始吧~ 简单说下仓库的概念，仓库的英文名是repository，你可以简单理解成一个目录，这个目录里面的所有文件都可以被Git管理起来，每个文件的修改、删除，Git都能跟踪，以便任何时刻都可以追踪历史，或者在将来某个时刻可以“还原”。 点击上面的+号，新建一个仓库 输入我们的仓库名称后，点击下面”create repository”按钮即可创建一个仓库 我们可以看到这个仓库是空的，什么都没有。 接下来，我们回到本地git上。 克隆仓库回到git bash命令窗口 输入1cd e: 切换目录，执行1git clone git@github.com:tenny-peng/test.git 稍等一会，就可将github上的项目克隆到本地 这里我选的e盘根目录，你可以自己修改，注意：选择的目录下不可以有仓库同名目录如我的e盘下不能有test这个目录，不然在克隆时会报错。 这里有一个警告，说我们的仓库是空的，不用管它，我们马上会添加文件。 添加文件使用Windows的童鞋要特别注意： 千万不要使用Windows自带的记事本编辑任何文本文件。原因是Microsoft开发记事本的团队使用了一个非常弱智的行为来保存UTF-8编码的文件，他们自作聪明地在每个文件开头添加了0xefbbbf（十六进制）的字符，你会遇到很多不可思议的问题，比如，网页第一行可能会显示一个“?”，明明正确的程序一编译就报语法错误，等等，都是由记事本的弱智行为带来的。建议你下载Notepad++代替记事本，不但功能强大，而且免费！记得把notepad++的默认编码设置为UTF-8without BOM即可。 在仓库test文件目录下，我们先编写一个readme.txt文件，内容如下：12Git is a version control system.Git is free software. 这里我们可以看到test目录下有一个隐藏的.git目录(看不到可自行百度“windows查看隐藏文件方法”)，这个就说明此目录是由git管理的仓库了，如果删除了这个隐藏的目录，那个git也就不认识这个目录了，也不能对此目录下的文件进行管理了。 回到命令行，输入1git add readme.txt 什么反馈信息也没有？那就对了，Unix的哲学是“没有消息就是好消息”，说明添加成功。 使用1git status 可查看当前仓库状态 我们发现提示有新文件，但是这样还不够。 我们继续输入1git commit -m &quot;add readme.txt&quot; 这样才把文件提交到仓库，再次输入”git status”查看状态 简单解释一下git commit命令，-m后面输入的是本次提交的说明，可以输入任意内容，当然最好是有意义的，这样你就能从历史记录里方便地找到改动记录。 git commit命令执行成功后会告诉你，1个文件被改动（我们新添加的readme.txt文件），插入了两行内容（readme.txt有两行内容）。 推送这里我就在仓库里新增了一个文件，当然还会有修改，删除操作。其实这样就可以管理自己的项目了。但是，我们似乎忘记了github。对，我们需要的是随时随处可获取，所以我们需要把本地仓库的内容同步到github这个托管平台。 当你从远程仓库克隆时，实际上Git自动把本地的master分支(分支后面再讲，简单理解为仓库的多个版本，默认一个主分支)和远程的master分支对应起来了，并且，远程仓库的默认名称是origin。 要查看远程库的信息，输入1git remote 或1git remote -v 获取更详细信息 上面显示了可以抓取和推送的origin的地址。如果没有推送权限，就看不到push的地址。 接下来我们把本地改动(这里新增了一个文件，对于git，新增，修改，删除，都属于改动)推送到远程仓库。1git push origin master 刷新浏览器中我们的github主页，可以看到，readme.txt文件已经同步到远程仓库了。 以上我们就使用git创建了自己的仓库，并将其同步到远程服务器上，以便我们在其它地方，或其他人获取。 参考： 廖雪峰的git教程 git互动百科 github互动百科]]></content>
+    </entry>
+
+    
+    <entry>
+      <title><![CDATA[Markdown基础语法]]></title>
+      <url>%2F2017%2F04%2F03%2FMarkDown%E5%9F%BA%E7%A1%80%E8%AF%AD%E6%B3%95%2F</url>
+      <content type="text"><![CDATA[标准mrakdown语法加粗和斜体字体加粗以两个*或两个_开头结尾1__重要的事情说三遍！！！__ **重要的事情说三遍！！！** 效果如下： 重要的事情说三遍！！！ 字体倾斜以一个*或_开头结尾1_一段斜体文字_ *一段斜体文字* 效果如下： 一段斜体文字 链接和邮件链接：12bla bla bla [example](http://url.com/ &quot;Title&quot;)这是我们常用的网站: [百度一下](www.baidu.com &quot;百度一下&quot;) 效果如下： 这是我们常用的网站: baidu 也可以定义一个id来对应链接地址12345bla bla bla [example][id]. Then, anywhere else in the doc, define the link:[id]: http://example.com/ &quot;Title&quot;这是我们常用的网站: [baidu][baiduId][baiduId]: www.baidu.com &quot;百度一下&quot; 效果如下： 这是我的博客，欢迎访问。 邮件：12An email &lt;example@example.com&gt; link.这是我的邮箱&lt;mpengtaoqi@163.com&gt;。 效果如下： 这是我的邮箱&#109;&#x70;&#x65;&#x6e;&#103;&#x74;&#x61;&#111;&#113;&#x69;&#x40;&#49;&#x36;&#51;&#x2e;&#x63;&#x6f;&#109;。 图片行内引用 (标题可选):12![alt text](/path/img.jpg &quot;Title&quot;)这里出现一个引用的图片![图片替代文字](https://tenny-peng.github.io/images/avatar.jpg &quot;偷得浮生半日闲&quot;) 效果如下： 这里出现一个引用的图片 使用id引用图片链接：12345![alt text][id][id]: /url/to/img.jpg &quot;Title&quot;使用id引用图片链接![图片替代文字][img_id][img_id](https://tenny-peng.github.io/images/avatar.jpg &quot;偷得浮生半日闲&quot;) 效果如下： 使用id引用图片链接 标题底线形式:12345标题 1========标题 2-------- 效果如下： 标题 1标题 2#模式 (末尾的#可选):12345# 标题 1 ### 标题 2 ######## 标题 6 效果如下： 标题 1标题 2标题 6列表有序的, 不带段落:1231. Git2. Hexo3. MarkDown 效果如下： Git Hexo MarkDown 无序的, 带段落:12345* 一个条目. 巴拉巴拉拉，这里是段落文字.* 其他条目 效果如下： 一个条目. 巴拉巴拉巴拉，这里是段落文字. 其他条目 你可以嵌套使用它们：12345678* Work * java* Blog 1. github 2. atom * markdown 3. hexo* learn 效果如下： Work java Blog github atom markdown hexo learn 区块引用123456789&gt; 类似邮件的引用方式&gt; 在断好的行前加上`&gt;`&gt; &gt; 也可以嵌套使用&gt; #### 引用标题&gt;&gt; * 也可以是一个列表&gt; * 等等 效果如下： 类似邮件的引用方式在断好的行前加上&gt; 也可以嵌套使用 引用标题 也可以是一个列表 等等 内联代码12345`&lt;some code&gt;` 使用引号和反引号标记行内代码片段。如果要在代码区段内插入反引号，可以用多个反引号来开启和结束代码区段。例如 `` `this` ``. 效果如下： &lt;some code&gt; 使用引号和反引号标记行内代码片段。 如果要在代码区段内插入反引号，可以用多个反引号来开启和结束代码区段。 例如 `this` . 代码块在句段的行首插入1个tab 或 4个空格，则表示代码块。123这是一段普通的文字。 这一段代码块。 分隔线用三个以上的星号或减号或底线来建立一个水平分隔线。 行内不能有其他东西，但你可以在星号或是减号中间插入空格。12345---* * *- - - - 效果如下： 换行在一行的结尾处加上2个或2个以上的空格12Roses are red, Violets are blue. 效果如下： Roses are red,Violets are blue.]]></content>
+    </entry>
+
+    
+  
+  
+</search>
