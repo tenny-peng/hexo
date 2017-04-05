@@ -322,7 +322,7 @@ youyan_uid: 2130018
 #    button | slide
 # Warning: Baidu Share does not support https.
 #baidushare:
-##  type: button
+type: button
 
 # Share
 #jiathis:
