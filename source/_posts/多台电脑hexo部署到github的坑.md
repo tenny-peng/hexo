@@ -1,6 +1,6 @@
 ---
 layout: title
-title: 同台电脑hexo部署到github的坑
+title: 多台电脑hexo部署到github的坑
 date: 2017-04-05 10:54:05
 tags: hexo
 categories: hexo+github搭建博客
@@ -65,7 +65,7 @@ error: The following untracked working tree files would be overwritten by merge:
         node_modules/.bin/acorn.cmd
         ...
 ```
-具体不太清除(知道的童鞋欢迎指正)，可能本地进行过hexo生成和发布操作，网上查到解决办法是先清理
+这里说一下，第一个坑中hexo目录下的内容是我直接从github/hexo上down下来复制过来的，然后本地又进行过hexo生成和发布操作，错误具体原因不太清除(知道的童鞋欢迎指正)，网上查到解决办法是先清理
 ```
 $ git clean -f -d
 Skipping repository .deploy_git/
@@ -79,10 +79,11 @@ Removing scaffolds/
 Removing source/
 Removing themes/
 ```
-再拉取就可以了
+清理后hexo目录下只剩.deploy_git和.git目录，再拉取就可以了
 ```
 $ git pull origin master
 From github.com:tenny-peng/hexo
  * branch            master     -> FETCH_HEAD
 Checking out files: 100% (7651/7651), done.
 ```
+所以下次可以先同步好hexo文件夹，这样第二个坑应该就不会出现了。
