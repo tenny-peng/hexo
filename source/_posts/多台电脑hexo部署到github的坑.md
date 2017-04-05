@@ -1,5 +1,4 @@
 ---
-layout: title
 title: 多台电脑hexo部署到github的坑
 date: 2017-04-05 10:54:05
 tags: hexo
@@ -14,7 +13,7 @@ categories: hexo+github搭建博客
 同样进行了一系列的node安装，hexo安装等，并且在hexo博客目录下down下了guthub/hexo的资源，本地启动，没问题。
 但是当我发布想发布到yourname.github.io上时，问题来了，它居然把我的**整个hexo博客目录**扔到了yourname.github.io上，不是说好的只发布**.deploy_git**下的内容呢！！
 
-于是我就茫然了啊，我去查看hexo下的_config.xml文件，
+于是我就茫然了啊，我去查看hexo下的_config.yml文件，
 ```
 deploy:
   type: git
