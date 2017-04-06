@@ -247,3 +247,21 @@ Violets are blue.
 
 Roses are red,   
 Violets are blue.
+
+## 表格
+```
+| 字段 | 左对齐 | 居中 | 右对齐 |       //表头
+|------|:------|:----:|------:|       //对齐方式(默认左对齐)
+| 1 | left1 | center1 | right1 |      //内容
+| 2 | left2 | center2 | right2 |
+| 3 | left3 | center3 | right3 |
+| 4 | left4 | center4 | right4 |
+```
+效果如下：
+
+| 默认字段 | 左对齐字段 | 居中字段 | 右对齐字段 |
+|------|:------|:----:|------:|
+| 1 | left1 | center1 | right1 |
+| 2 | left2 | center2 | right2 |
+| 3 | left3 | center3 | right3 |
+| 4 | left4 | center4 | right4 |  
