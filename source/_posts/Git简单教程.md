@@ -79,9 +79,25 @@ GitHub 正是这样一个面向开源及私有软件项目的托管平台。
 接下来，我们回到本地git上。
 
 # 克隆仓库
-回到git bash命令窗口
 
-输入
+由于你的本地Git仓库和GitHub仓库之间的传输是通过SSH加密的，所以还需要一点设置：
+
+回到git bash命令窗口，创建SSH  key:
+```
+$ ssh-keygen -t rsa -C "youremail@example.com"
+```
+你需要把邮件地址换成你自己的邮件地址，然后一路回车，使用默认值即可，由于这个Key也不是用于军事目的，所以也无需设置密码。
+
+如果一切顺利的话，可以在用户主目录里找到.ssh目录，里面有id_rsa和id_rsa.pub两个文件，这两个就是SSH Key的秘钥对，id_rsa是私钥，不能泄露出去，id_rsa.pub是公钥，可以放心地告诉任何人。
+
+登录你的github，进入setting，点击"SSH and GPG keys",点击右上角"New SSH Key",tite随便填，Key文本框里粘贴id_rsa.pub文件的内容，最后点击"Add SSh Key"即可。
+![填写公钥](Git简单教程/20170408134106.png)
+
+可以看到我这里已经有两个了，一个家里一个公司，这样就可以两边同步信息了。
+
+为什么GitHub需要SSH Key呢？因为GitHub需要识别出你推送的提交确实是你推送的，而不是别人冒充的，而Git支持SSH协议，所以，GitHub只要知道了你的公钥，就可以确认只有你自己才能推送。
+
+接下来输入
 ```
 cd e:
 ```
