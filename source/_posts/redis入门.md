@@ -1,6 +1,6 @@
 ---
 layout: title
-title: redis学习记录
+title: redis入门
 date: 2017-04-15 08:54:10
 tags: redis
 categories: redis
@@ -22,19 +22,19 @@ Redis官方并不支持Windows。 但是，微软针对Win64自己开发了一�
 点击[https://github.com/MSOpenTech/redis/releases](https://github.com/MSOpenTech/redis/releases)下载。
 
 选择你喜欢的安装方式，这里我选择压缩版。
-![下载redis](redis学习记录/20170415092253.png)
+![下载redis](redis入门/20170415092253.png)
 
 安装/解压缩后到redis目录找到redis-server.exe和redis-cli.exe
-![redis目录](redis学习记录/20170415094655.png)
+![redis目录](redis入门/20170415094655.png)
 
 双击redis-server.exe启动redis服务
-![redis服务](redis学习记录/20170415095002.png)
+![redis服务](redis入门/20170415095002.png)
 
 双击redis-cli.exe启动客户端，用来访问redis服务。
-![redis客户端](redis学习记录/20170415095226.png)
+![redis客户端](redis入门/20170415095226.png)
 
 测试一下，设置x的值为1并获取x。
-![redis测试](redis学习记录/20170415095445.png)
+![redis测试](redis入门/20170415095445.png)
 
 # 使用redis
 redis使用key-value来存储数据。
