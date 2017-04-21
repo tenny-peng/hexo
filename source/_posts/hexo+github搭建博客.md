@@ -68,9 +68,13 @@ hexo init
 ```
 npm -install
 ```
-npm会自动安装需要的组件，等待即可。
+npm会自动安装需要的组件。之后输入
+```
+npm install hexo-deployer-git --save
+```
+hexo扩展，用于将博客发布到github上。
 
-# 体验Hexo
+# 体验博客
 
 ## 本地博客
 继续输入hexo g生成文件
@@ -125,4 +129,23 @@ deploy:
 ```
 
 ## 编写博客
-hexo
+hexo根目录下执行
+```
+hexo new title "test"
+```
+然后在D:\devsoft\hexo\source\_posts下就能看到test.md文件了。
+
+.md文件是用MarkDown语法写的，关于MarkDown语法，可以参考我的[MarkDown基础语法](../../03/MarkDown基础语法/index.html)。  
+MarkDown文件编辑器推荐用Atom，Atom是Github专门为程序员推出的一个跨平台文本编辑器。可以到https://atom.io/ 下载Atom，也可以找寻其他自己喜欢的MarkDown编辑器。
+
+## 部署博客
+文章编辑完后，使用命令生成，部署
+```
+hexo g      //生成静态文件
+hexo d      //部署到github上
+```
+也可以直接执行以下命令，相当于上面两条命令一起执行
+```
+hexo d -g     //部署前先生成
+```
+部署完成后，访问https://yourname.github.io (例如我的https://tenny-peng.github.io) ，就可以看到生成的文章。
