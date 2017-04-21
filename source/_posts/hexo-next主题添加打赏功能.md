@@ -2,7 +2,7 @@
 title: hexo-next主题添加打赏功能
 date: 2017-04-05 14:38:24
 tags: [hexo,next]
-categories: hexo+github搭建博客
+categories: hexo+github博客
 ---
 next主题集成了打赏功能，使用起来比较简单。
 

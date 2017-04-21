@@ -2,7 +2,7 @@
 title: 多台电脑hexo部署到github的坑
 date: 2017-04-05 10:54:05
 tags: hexo
-categories: hexo+github搭建博客
+categories: hexo+github博客
 ---
 
 之前在家里搭建了博客，成功部署到github上，并将hexo目录也上传至github/hexo仓库保存。

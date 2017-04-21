@@ -1,7 +1,7 @@
 ---
 title: MarkDown设置字体颜色
 date: 2017-04-03 21:15:12
-tags: [markdown，字体颜色]
+tags: [markdown]
 categories: markdown
 ---
 
