@@ -1,8 +1,8 @@
 ---
-title: 2-Hello World!
+title: Hello World!
 date: 2017-04-08 17:34:50
 tags: [java]
-categories: 从零开始学Java
+categories: Java学习记录
 ---
 
 # 开始动手，Hello World！！

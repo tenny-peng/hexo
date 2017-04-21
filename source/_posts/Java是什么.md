@@ -1,8 +1,8 @@
 ---
-title: 1-Java是什么
+title: Java是什么
 date: 2017-04-08 14:30:18
 tags: [java]
-categories: 从零开始学Java
+categories: Java学习记录
 ---
 
 # Java 技术
