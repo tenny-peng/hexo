@@ -224,7 +224,7 @@ favicon: /favicon.ico
 然后将favicon.ico放在hexo/source目录下即可。
 
 <font size="5">以上基本就完成了个人博客的搭建，更多信息可参考：</font>
-<br />
+
 [史上最详细的Hexo博客搭建图文教程](https://xuanwo.org/2015/03/26/hexo-intor/)
 
 [hexo官网](https://hexo.io/)
