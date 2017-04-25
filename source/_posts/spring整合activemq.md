@@ -87,91 +87,91 @@ activemq.queue.name=tenny:test
 
 ## 4.spring-activemq.xml配置文件
 ```
-<?xml version="1.0" encoding="UTF-8"?>  
-<beans xmlns="http://www.springframework.org/schema/beans"  
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:context="http://www.springframework.org/schema/context"  
-    xmlns:jms="http://www.springframework.org/schema/jms"  
-    xsi:schemaLocation="http://www.springframework.org/schema/beans
-    					http://www.springframework.org/schema/beans/spring-beans.xsd
-						http://www.springframework.org/schema/context
-						http://www.springframework.org/schema/context/spring-context.xsd  
-						http://www.springframework.org/schema/beans
-						http://www.springframework.org/schema/beans/spring-beans.xsd  
-						http://www.springframework.org/schema/jms
-						http://www.springframework.org/schema/jms/spring-jms.xsd">
+  <?xml version="1.0" encoding="UTF-8"?>  
+  <beans xmlns="http://www.springframework.org/schema/beans"  
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:context="http://www.springframework.org/schema/context"  
+      xmlns:jms="http://www.springframework.org/schema/jms"  
+      xsi:schemaLocation="http://www.springframework.org/schema/beans
+  						http://www.springframework.org/schema/beans/spring-beans.xsd
+  						http://www.springframework.org/schema/context
+  						http://www.springframework.org/schema/context/spring-context.xsd  
+  						http://www.springframework.org/schema/beans
+  						http://www.springframework.org/schema/beans/spring-beans.xsd  
+  						http://www.springframework.org/schema/jms
+  						http://www.springframework.org/schema/jms/spring-jms.xsd">
 
-    <context:property-placeholder location="classpath:activemq.properties" />
+      <context:property-placeholder location="classpath:activemq.properties" />
 
-	<!-- 真正可以产生Connection的ConnectionFactory，由对应的 JMS服务厂商提供-->  
-	<bean id="targetConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">  
-	    <property name="brokerURL" value="${activemq.brokerURL}"/>  
-	</bean>
+  	<!-- 真正可以产生Connection的ConnectionFactory，由对应的 JMS服务厂商提供-->  
+  	<bean id="targetConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">  
+  	    <property name="brokerURL" value="${activemq.brokerURL}"/>  
+  	</bean>
 
-	<bean id="pooledConnectionFactory" class="org.apache.activemq.pool.PooledConnectionFactory" destroy-method="stop">  
-	    <property name="connectionFactory" ref="targetConnectionFactory"/>  
-	    <property name="maxConnections" value="${activemq.maxConnections}"/>  
-	</bean>
+  	<bean id="pooledConnectionFactory" class="org.apache.activemq.pool.PooledConnectionFactory" destroy-method="stop">  
+  	    <property name="connectionFactory" ref="targetConnectionFactory"/>  
+  	    <property name="maxConnections" value="${activemq.maxConnections}"/>  
+  	</bean>
 
-	<bean id="connectionFactory" class="org.springframework.jms.connection.SingleConnectionFactory">  
-	    <property name="targetConnectionFactory" ref="pooledConnectionFactory"/>  
-	</bean>
+  	<bean id="connectionFactory" class="org.springframework.jms.connection.SingleConnectionFactory">  
+  	    <property name="targetConnectionFactory" ref="pooledConnectionFactory"/>  
+  	</bean>
 
-	<!-- Spring提供的JMS工具类，它可以进行消息发送、接收等 -->  
-	<bean id="jmsTemplate" class="org.springframework.jms.core.JmsTemplate">  
-	    <property name="connectionFactory" ref="connectionFactory"/>  
-	    <property name="defaultDestinationName" value="${activemq.queue.name}"/>  
-	</bean>
+  	<!-- Spring提供的JMS工具类，它可以进行消息发送、接收等 -->  
+  	<bean id="jmsTemplate" class="org.springframework.jms.core.JmsTemplate">  
+  	    <property name="connectionFactory" ref="connectionFactory"/>  
+  	    <property name="defaultDestinationName" value="${activemq.queue.name}"/>  
+  	</bean>
 
-	<!--队列目的地，点对点模式-->  
-	<bean id="queueDestination" class="org.apache.activemq.command.ActiveMQQueue">  
-	    <constructor-arg>
-	        <value>
-	            ${activemq.queue.name}
-	        </value>
-	    </constructor-arg>  
-	</bean>
+  	<!--队列目的地，点对点模式-->  
+  	<bean id="queueDestination" class="org.apache.activemq.command.ActiveMQQueue">  
+  	    <constructor-arg>
+  	        <value>
+  	            ${activemq.queue.name}
+  	        </value>
+  	    </constructor-arg>  
+  	</bean>
 
-	<!-- 消息监听器 -->  
-	<bean id="activeMQMessageListener" class="com.news.common.activemq.ActiveMQMessageListener" />      
+  	<!-- 消息监听器 -->  
+  	<bean id="activeMQMessageListener" class="com.news.common.activemq.ActiveMQMessageListener" />      
 
-	<!-- 消息监听容器 -->
-	<bean id="jmsContainer" class="org.springframework.jms.listener.DefaultMessageListenerContainer">  
-	    <property name="connectionFactory" ref="connectionFactory" />  
-	    <property name="destination" ref="queueDestination" />  
-	    <property name="messageListener" ref="activeMQMessageListener" />  
-	</bean>
-</beans>
-```
+  	<!-- 消息监听容器 -->
+  	<bean id="jmsContainer" class="org.springframework.jms.listener.DefaultMessageListenerContainer">  
+  	    <property name="connectionFactory" ref="connectionFactory" />  
+  	    <property name="destination" ref="queueDestination" />  
+  	    <property name="messageListener" ref="activeMQMessageListener" />  
+  	</bean>
+  </beans>
+  ```
 
-其中的ActiveMQMessageListener
-```
-package com.news.common.activemq;
+  其中的ActiveMQMessageListener
+  ```
+  package com.news.common.activemq;
 
-import javax.jms.JMSException;
-import javax.jms.Message;
-import javax.jms.MessageListener;
-import javax.jms.TextMessage;
+  import javax.jms.JMSException;
+  import javax.jms.Message;
+  import javax.jms.MessageListener;
+  import javax.jms.TextMessage;
 
-/**
- *
- * activemq消息监听
- *
- * @author Tenny.Peng
- */
-public class ActiveMQMessageListener implements MessageListener {
+  /**
+   *
+   * activemq消息监听
+   *
+   * @author Tenny.Peng
+   */
+  public class ActiveMQMessageListener implements MessageListener {
 
-	@Override
-	public void onMessage(Message message) {
-		TextMessage textMsg = (TextMessage) message;
-		try {
-			// 处理消息
-			System.out.println("receive message from " + textMsg.getJMSDestination() + ": " + textMsg.getText());
-		} catch (JMSException e) {
-			e.printStackTrace();
-		}
-	}
-}
+  	@Override
+  	public void onMessage(Message message) {
+  		TextMessage textMsg = (TextMessage) message;
+  		try {
+  			// 处理消息
+  			System.out.println("receive message from " + textMsg.getJMSDestination() + ": " + textMsg.getText());
+  		} catch (JMSException e) {
+  			e.printStackTrace();
+  		}
+  	}
+  }
 ```
 
 ## 5.测试类TestActivemq.java
