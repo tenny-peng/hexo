@@ -77,7 +77,7 @@
 
 
 
-  <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml" />
+  <link rel="alternate" href="/atom.xml" title="Tenny's Blog" type="application/atom+xml" />
 
 
 
@@ -99,7 +99,7 @@
 <meta property="og:type" content="article">
 <meta property="og:title" content="Git简单教程">
 <meta property="og:url" content="https://tenny-peng.github.io/2017/04/03/Git简单教程/index.html">
-<meta property="og:site_name" content="Hexo">
+<meta property="og:site_name" content="Tenny's Blog">
 <meta property="og:description" content="简介Git是一款免费、开源的分布式版本控制系统，用于敏捷高效地处理任何或小或大的项目,
 可以有效、高速的处理从很小到非常大的项目版本管理。
 安装由于本人是Windows平台，所以这里安装的是Windows平台下的工具。
@@ -114,6 +114,7 @@
 <meta property="og:image" content="https://tenny-peng.github.io/2017/04/03/Git简单教程/20170403204148.png">
 <meta property="og:image" content="https://tenny-peng.github.io/2017/04/03/Git简单教程/0170403204526.png">
 <meta property="og:image" content="https://tenny-peng.github.io/2017/04/03/Git简单教程/20170403205231.png">
+<meta property="og:image" content="https://tenny-peng.github.io/2017/04/03/Git简单教程/20170408134106.png">
 <meta property="og:image" content="https://tenny-peng.github.io/2017/04/03/Git简单教程/20170403212928.png">
 <meta property="og:image" content="https://tenny-peng.github.io/2017/04/03/Git简单教程/20170403210357.png">
 <meta property="og:image" content="https://tenny-peng.github.io/2017/04/03/Git简单教程/20170403213141.png">
@@ -123,7 +124,7 @@
 <meta property="og:image" content="https://tenny-peng.github.io/2017/04/03/Git简单教程/20170403214855.png">
 <meta property="og:image" content="https://tenny-peng.github.io/2017/04/03/Git简单教程/20170403215328.png">
 <meta property="og:image" content="https://tenny-peng.github.io/2017/04/03/Git简单教程/20170403215427.png">
-<meta property="og:updated_time" content="2017-04-03T15:05:20.086Z">
+<meta property="og:updated_time" content="2017-04-19T08:45:31.632Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Git简单教程">
 <meta name="twitter:description" content="简介Git是一款免费、开源的分布式版本控制系统，用于敏捷高效地处理任何或小或大的项目,
@@ -167,7 +168,7 @@
 
 
 
-  <title> Git简单教程 | Hexo </title>
+  <title> Git简单教程 | Tenny's Blog </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -213,7 +214,7 @@
     <div class="custom-logo-site-title">
       <a href="/"  class="brand" rel="start">
         <span class="logo-line-before"><i></i></span>
-        <span class="site-title">Hexo</span>
+        <span class="site-title">Tenny's Blog</span>
         <span class="logo-line-after"><i></i></span>
       </a>
     </div>
@@ -353,13 +354,13 @@
     <link itemprop="mainEntityOfPage" href="https://tenny-peng.github.io/2017/04/03/Git简单教程/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="John Doe">
+      <meta itemprop="name" content="Tenny Peng">
       <meta itemprop="description" content="">
       <meta itemprop="image" content="/images/avatar.jpg">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Hexo">
+      <meta itemprop="name" content="Tenny's Blog">
     </span>
 
     
@@ -478,8 +479,14 @@
 <p>输入我们的仓库名称后，点击下面”create repository”按钮即可创建一个仓库<br><img src="/2017/04/03/Git简单教程/0170403204526.png" alt="仓库信息"></p>
 <p>我们可以看到这个仓库是空的，什么都没有。<br><img src="/2017/04/03/Git简单教程/20170403205231.png" alt="空仓库"></p>
 <p>接下来，我们回到本地git上。</p>
-<h1 id="克隆仓库"><a href="#克隆仓库" class="headerlink" title="克隆仓库"></a>克隆仓库</h1><p>回到git bash命令窗口</p>
-<p>输入<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">cd e:</div></pre></td></tr></table></figure></p>
+<h1 id="克隆仓库"><a href="#克隆仓库" class="headerlink" title="克隆仓库"></a>克隆仓库</h1><p>由于你的本地Git仓库和GitHub仓库之间的传输是通过SSH加密的，所以还需要一点设置：</p>
+<p>回到git bash命令窗口，创建SSH  key:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ ssh-keygen -t rsa -C &quot;youremail@example.com&quot;</div></pre></td></tr></table></figure></p>
+<p>你需要把邮件地址换成你自己的邮件地址，然后一路回车，使用默认值即可，由于这个Key也不是用于军事目的，所以也无需设置密码。</p>
+<p>如果一切顺利的话，可以在用户主目录里找到.ssh目录，里面有id_rsa和id_rsa.pub两个文件，这两个就是SSH Key的秘钥对，id_rsa是私钥，不能泄露出去，id_rsa.pub是公钥，可以放心地告诉任何人。</p>
+<p>登录你的github，进入setting，点击”SSH and GPG keys”,点击右上角”New SSH Key”,tite随便填，Key文本框里粘贴id_rsa.pub文件的内容，最后点击”Add SSh Key”即可。<br><img src="/2017/04/03/Git简单教程/20170408134106.png" alt="填写公钥"></p>
+<p>可以看到我这里已经有两个了，一个家里一个公司，这样就可以两边同步信息了。</p>
+<p>为什么GitHub需要SSH Key呢？因为GitHub需要识别出你推送的提交确实是你推送的，而不是别人冒充的，而Git支持SSH协议，所以，GitHub只要知道了你的公钥，就可以确认只有你自己才能推送。</p>
+<p>接下来输入<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">cd e:</div></pre></td></tr></table></figure></p>
 <p>切换目录，执行<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">git clone git@github.com:tenny-peng/test.git</div></pre></td></tr></table></figure></p>
 <p>稍等一会，就可将github上的项目克隆到本地</p>
 <p><img src="/2017/04/03/Git简单教程/20170403212928.png" alt="本地仓库"></p>
@@ -533,6 +540,27 @@
     <div>
       
         
+  <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+    <div>如果觉得我的文章对您有用，请随意打赏。您的支持将鼓励我继续创作！</div>
+    <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+      <span>赏</span>
+    </button>
+    <div id="QR" style="display: none;">
+      
+        <div id="wechat" style="display: inline-block">
+          <img id="wechat_qr" src="/images/wechatpay.png" alt="Tenny Peng WeChat Pay"/>
+          <p>微信打赏</p>
+        </div>
+      
+      
+        <div id="alipay" style="display: inline-block">
+          <img id="alipay_qr" src="/images/alipay.jpg" alt="Tenny Peng Alipay"/>
+          <p>支付宝打赏</p>
+        </div>
+      
+    </div>
+  </div>
+
 
       
     </div>
@@ -634,8 +662,8 @@
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
           <img class="site-author-image" itemprop="image"
                src="/images/avatar.jpg"
-               alt="John Doe" />
-          <p class="site-author-name" itemprop="name">John Doe</p>
+               alt="Tenny Peng" />
+          <p class="site-author-name" itemprop="name">Tenny Peng</p>
            
               <p class="site-description motion-element" itemprop="description"></p>
           
@@ -645,7 +673,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-count">18</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -656,7 +684,7 @@
             
             <div class="site-state-item site-state-categories">
               <a href="/categories/index.html">
-                <span class="site-state-item-count">3</span>
+                <span class="site-state-item-count">11</span>
                 <span class="site-state-item-name">分类</span>
               </a>
             </div>
@@ -667,7 +695,7 @@
             
             <div class="site-state-item site-state-tags">
               <a href="/tags/index.html">
-                <span class="site-state-item-count">5</span>
+                <span class="site-state-item-count">15</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
@@ -736,7 +764,7 @@
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>
-  <span class="author" itemprop="copyrightHolder">John Doe</span>
+  <span class="author" itemprop="copyrightHolder">Tenny Peng</span>
 </div>
 
 
