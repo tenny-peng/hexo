@@ -13,11 +13,11 @@ Hexo是一款基于Node.js的静态博客框架，配合github可以搭建属于
 ## 安装Node.js
 Hexo需要node.js支持，可以到[node.js中文网](http://nodejs.cn/download/)下载适合自己系统的安装包。安装也比较简单，一路next下去就可以了。
 
-安装完后win + r 输入cmd回车，打开命令行界面，分别输入node -v 和nmp -v，看到类似如下结果就说明安装成功了。
+安装完后win + r 输入cmd回车，打开命令行界面，分别输入node -v 和npm -v，看到类似如下结果就说明安装成功了。
 ```
 >node -v
 v6.10.1
->nmp -v
+>npm -v
 3.10.10
 ```
 
