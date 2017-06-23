@@ -313,6 +313,860 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://tenny-peng.github.io/2017/06/21/web安全入门/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Tenny Peng">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Tenny's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/2017/06/21/web安全入门/" itemprop="url">
+                  web安全入门
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-21T17:10:47+08:00">
+                2017-06-21
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/web安全/" itemprop="url" rel="index">
+                    <span itemprop="name">web安全</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>最近项目涉及到安全方面，自己特意了解了一下，记录在此，共同学习。</p>
+<p>常见的web安全有以下几个方面</p>
+<ul>
+<li>同源策略（Same Origin Policy）</li>
+<li>跨站脚本攻击XSS（Cross Site Scripting）</li>
+<li>跨站请求伪造CSRF（Cross-site Request Forgery）</li>
+<li>点击劫持（Click Jacking）</li>
+<li>SQL注入（SQL Injection）</li>
+</ul>
+<h1 id="同源策略"><a href="#同源策略" class="headerlink" title="同源策略"></a>同源策略</h1><h2 id="含义"><a href="#含义" class="headerlink" title="含义"></a>含义</h2><p>所谓同源策略，指的是浏览器对不同源的脚本或者文本的访问方式进行的限制。比如源a的js不能读取或设置引入的源b的元素属性。</p>
+<p>所谓”同源”指的是”三个相同”</p>
+<ul>
+<li>协议相同</li>
+<li>域名相同</li>
+<li>端口相同</li>
+</ul>
+<p>举例来说，<a href="http://www.example.com/dir/page.html" target="_blank" rel="external">http://www.example.com/dir/page.html</a> 这个网址，协议是 http:// ，域名是 www.example.com ，端口是 80（默认端口可以省略）。它的同源情况如下<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">http://www.example.com/dir2/other.html：同源</div><div class="line">http://example.com/dir/other.html：不同源（域名不同）</div><div class="line">http://v2.www.example.com/dir/other.html：不同源（域名不同）</div><div class="line">http://www.example.com:81/dir/other.html：不同源（端口不同）</div></pre></td></tr></table></figure></p>
+<h2 id="目的"><a href="#目的" class="headerlink" title="目的"></a>目的</h2><p>同源政策的目的，是为了保证用户信息的安全，防止恶意的网站窃取数据。</p>
+<p>设想这样一种情况：A网站是一家银行，用户登录以后，又去浏览其他网站。如果其他网站可以读取A网站的 Cookie，Cookie 包含的信息（比如存款总额）就会泄漏。而Cookie 往往用来保存用户的登录状态，如果用户没有退出登录，其他网站就可以冒充用户，为所欲为。</p>
+<p>由此可见，”同源政策”是必需的，否则 Cookie 可以共享，互联网就毫无安全可言了。</p>
+<h2 id="限制"><a href="#限制" class="headerlink" title="限制"></a>限制</h2><p>随着互联网的发展，”同源政策”越来越严格。目前，如果非同源，共有三种行为受到限制</p>
+<ul>
+<li>Cookie、LocalStorage 和 IndexDB 无法读取</li>
+<li>DOM 无法获得</li>
+<li>AJAX 请求不能发送</li>
+</ul>
+<h2 id="Ajax应用"><a href="#Ajax应用" class="headerlink" title="Ajax应用"></a>Ajax应用</h2><p>我们可以在本地模拟非同源的ajax请求。</p>
+<p>先写一个简单的web应用作为服务方，提供一个登陆服务接口，部署运行在tomcat上，此tomcat端口为8080。</p>
+<p>再写一个小工程，只有一个简单的登陆页面。部署在另一个tomcat上，此tomcat端口设定为8081。</p>
+<p>如此一来，两个工程就不是同源了，因为端口不同。我们在登陆页面发送ajax请求，出现错误：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">XMLHttpRequest cannot load http://192.168.2.82:8080/Demo/user/login. No &apos;Access-Control-Allow-Origin&apos; header is present on the requested resource. Origin &apos;http://localhost:8081&apos; is therefore not allowed access. The response had HTTP status code 403.</div></pre></td></tr></table></figure></p>
+<p>要解决这个问题，可以在服务器方设定<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">response.setHeader(&quot;Access-Control-Allow-Origin&quot;, &quot;*&quot;);</div></pre></td></tr></table></figure></p>
+<p>服务方就可以允许其他域名访问。</p>
+<p>要设定允许某个域名或某几个域名如下<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">response.setHeader(&quot;Access-Control-Allow-Origin&quot;, &quot;http://localhost:8081&quot;);</div><div class="line"></div><div class="line">response.setHeader(&quot;Access-Control-Allow-Origin&quot;, &quot;http://localhost:8081,http://localhost:8082&quot;);</div></pre></td></tr></table></figure></p>
+<p>在spring mvc中，有一个注解@CrossOrigin，在需要提供跨域访问的方法上添加即可<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">@CrossOrigin(origins = &#123;&quot;http://localhost:8081&quot;, &quot;http://192.168.2.99:8080&quot;&#125;)</div></pre></td></tr></table></figure></p>
+<p>这样就可以成功跨域登陆了。</p>
+<p>实际应用中，也可以让ajax访问同源服务接口，再由此服务去访问其他服务。</p>
+<h1 id="跨站脚本攻击"><a href="#跨站脚本攻击" class="headerlink" title="跨站脚本攻击"></a>跨站脚本攻击</h1><h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>跨站脚本攻击(Cross Site Scripting),为了不和层叠样式表（Cascading Style Sheets,CSS）缩写混淆，所以在安全领域叫做XSS。</p>
+<p>XSS攻击，是指黑客通过”HTML注入”篡改了网页，插入了恶意的脚本，在用户浏览网页时，代码执行，从而实现用户浏览器。对受害用户可能采取Cookie资料窃取、会话劫持、钓鱼欺骗等各种攻击。</p>
+<p>XSS有如下几种类型</p>
+<ol>
+<li><p>反射型XSS</p>
+<p> 反射型XSS只是简单地把用户输入的数据”反射”给浏览器。也就是说，黑客需要诱使用户点击一个恶意链接，才能攻击成功。反射型XSS也叫非持久型XSS。</p>
+<p> 比如</p>
+ <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&lt;div&gt;$&#123;message&#125;&lt;/div&gt;</div></pre></td></tr></table></figure>
+<p> 正常情况用户提交信息</p>
+ <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">http://xxx.com/test.html?param=hello</div></pre></td></tr></table></figure>
+<p> 那么浏览器正常输出”hello”信息</p>
+<p> 但是如果用户输入了一段HTML代码</p>
+ <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">http://xxx.com/test.html?param=&lt;script&gt;alert(&quot;xss&quot;)&lt;/script&gt;</div></pre></td></tr></table></figure>
+<p> 那么页面弹框，显示”XSS”</p>
+</li>
+<li><p>存储型XSS</p>
+<p> 存储型XSS会把用户输入的数据”存储”在服务器。这种XSS具有很强的稳定性。</p>
+<p> 比较常见的场景是，黑客写了一遍包含有恶意JavaScript的博客文章，文章发表后，所有访问该博客文章的用户，都会在他们的浏览器中执行这段恶意的JavaScript代码。黑客把恶意脚本保存到服务器端，所以这种XSS攻击就叫做”存储型XSS”。</p>
+</li>
+<li><p>DOM Based XSS</p>
+<p> 通过修改页面的DOM节点形成的XSS称之为DOM Based XSS。实际上，这种类型的XSS并非按照”数据是否保存在服务器端”来划分，DOM Based XSS从效果上来说也是反射型XSS。</p>
+<p> 假设xss.html页面代码如下</p>
+ <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line">&lt;!DOCTYPE HTML&gt;</div><div class="line">&lt;html&gt;</div><div class="line">    &lt;head&gt;</div><div class="line">        &lt;title&gt;xss&lt;/title&gt;</div><div class="line">        &lt;meta http-equiv=&quot;Content-Type&quot; content=&quot;text/html; charset=utf-8&quot; /&gt;</div><div class="line">    &lt;/head&gt;</div><div class="line">    &lt;body&gt;</div><div class="line">        &lt;div id=&quot;t&quot;&gt;&lt;/div&gt;</div><div class="line">        &lt;input type=&quot;text&quot; id=&quot;text&quot; value=&quot;&quot; /&gt;</div><div class="line">        &lt;input type=&quot;button&quot; id=&quot;s&quot; value=&quot;write&quot; onclick=&quot;test()&quot; /&gt;</div><div class="line">    &lt;/body&gt;</div><div class="line"></div><div class="line">    &lt;script&gt;</div><div class="line">        function test()&#123;</div><div class="line">            var str = document.getElementById(&quot;text&quot;).value;</div><div class="line">            document.getElementById(&quot;t&quot;).innerHTML = &quot;&lt;a href=&apos;&quot; + str + &quot;&apos;&gt;testLink&lt;/a&gt;&quot;;</div><div class="line">        &#125;</div><div class="line">    &lt;/script&gt;</div><div class="line"></div><div class="line">&lt;/html&gt;</div></pre></td></tr></table></figure>
+<p> 文本框输入内容并点击write按钮后，会在当前页面插入一个超链接，其地址为输入的内容。<br> <img src="/2017/06/21/web安全入门/20170622170319.png" alt="正常输入"><br> 假设用户输入为</p>
+ <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&apos; onclick=alert(/xss/) //</div></pre></td></tr></table></figure>
+<p> 那么页面代码变为</p>
+ <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&lt;a href&apos;&apos; onclick=alert(/xss/)//&apos;&gt;testLink&lt;/a&gt;</div></pre></td></tr></table></figure>
+<p> 首先用第一个单引号闭合掉href的第一个单引号，然后插入一个onclick事件，最后在用//注释掉第二个单引号。</p>
+<p> 点击链接，脚本执行<br> <img src="/2017/06/21/web安全入门/20170622171431.png" alt="脚本输入"></p>
+</li>
+</ol>
+<h2 id="防御"><a href="#防御" class="headerlink" title="防御"></a>防御</h2><p>XSS攻击成功的根本原因是将输入的数据当成了代码来执行，从而违背了原来的语义。所以要在输入的时候要严格过滤，输出的时候也要进行检查。</p>
+<h3 id="输入检查"><a href="#输入检查" class="headerlink" title="输入检查"></a>输入检查</h3><p>常见的XSS攻击，SQL注入，都要求攻击者构造一些特殊字符，这些特殊字符是正常用户不会用到的，所以输入检查很有必要。</p>
+<p>只接受指定长度范围和期望格式的的内容提交，阻止或者忽略除此外的其他任何数据。比如：用户名只能是字母加数字，手机不长于16位，且大陆手机必须以13x，15x开头，否则非法。过滤一些些常见的敏感字符，例如：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&lt; &gt; ‘ “ &amp; # \ javascript expression  &quot;onclick=&quot;  &quot;onfocus&quot;</div></pre></td></tr></table></figure></p>
+<p>过滤或移除特殊的Html标签， 例如:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&lt;script&gt;, &lt;iframe&gt; ,  &amp;lt; for &lt;, &amp;gt; for &gt;, &amp;quot for</div></pre></td></tr></table></figure></p>
+<p>过滤JavaScript 事件的标签，例如 “onclick=”, “onfocus” 等等。</p>
+<h3 id="输出检查"><a href="#输出检查" class="headerlink" title="输出检查"></a>输出检查</h3><p>一般来说，除了富文本的输出外，在变量输出到HTML页面时，可以使用编码(HtmlEncode)或转义的方式来防御XSS攻击。</p>
+<h3 id="DOM型的防御"><a href="#DOM型的防御" class="headerlink" title="DOM型的防御"></a>DOM型的防御</h3><p>把变量输出到页面时要做好相关的编码转义工作，如要输出到 &lt;script&gt;中，可以进行JS编码；要输出到HTML内容或属性，则进行HTML编码处理。根据不同的语境采用不同的编码处理方式。</p>
+<h3 id="HttpOnly"><a href="#HttpOnly" class="headerlink" title="HttpOnly"></a>HttpOnly</h3><p>将重要的cookie标记为http only,   这样的话当浏览器向Web服务器发起请求的时就会带上cookie字段，但是在脚本中却不能访问这个cookie，这样就避免了XSS攻击利用JavaScript的document.cookie获取cookie：</p>
+<h1 id="跨站请求伪造"><a href="#跨站请求伪造" class="headerlink" title="跨站请求伪造"></a>跨站请求伪造</h1><h2 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h2><p>CSRF原理比较简单，如图<br><img src="/2017/06/21/web安全入门/csrf原理图.jpg" alt="csrf原理图"></p>
+<ol>
+<li><p>用户C打开浏览器，访问受信任网站A，输入用户名和密码请求登录网站A;</p>
+</li>
+<li><p>在用户信息通过验证后，网站A产生Cookie信息并返回给浏览器，此时用户登录网站A成功，可以正常发送请求到网站A;</p>
+</li>
+<li><p>用户未退出网站A之前，在同一浏览器中，打开一个TAB页访问网站B;</p>
+</li>
+<li><p>网站B接收到用户请求后，返回一些攻击性代码，并发出一个请求要求访问第三方站点A;</p>
+</li>
+<li><p>浏览器在接收到这些攻击性代码后，根据网站B的请求，在用户不知情的情况下携带Cookie信息，向网站A发出请求。网站A并不知道该请求其实是由B发起的，所以会根据用户C的Cookie信息以C的权限处理该请求，导致来自网站B的恶意代码被执行。</p>
+</li>
+</ol>
+<p>假设用户在A网站可以删除自己的文章，其请求地址类似<a href="http://xxx.com/del.do?id=101。并且已经登录。" target="_blank" rel="external">http://xxx.com/del.do?id=101。并且已经登录。</a></p>
+<p>攻击者先构造一个自己的网页csrf.html，其内容为<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&lt;img src=&quot;http://xxx.com/del.do?id=102&quot;&gt;</div></pre></td></tr></table></figure></p>
+<p>攻击者诱使目标用户C访问该页面，之后再回去查看自己的文章，发现id为102的文章被删除了。</p>
+<p>原来在刚才访问csfr.html时，图片标签发送了一次请求，导致该文章被删除。</p>
+<h2 id="防御-1"><a href="#防御-1" class="headerlink" title="防御"></a>防御</h2><h3 id="验证码"><a href="#验证码" class="headerlink" title="验证码"></a>验证码</h3><p>因为csrf攻击是在用户不知情的情况下发起请求。验证码则强制用户与应用交互。</p>
+<p>但是出于用户体验考虑，网站不能给所有操作都加验证码。所以验证码只能作为一种辅助手段。</p>
+<h3 id="Referer-Check"><a href="#Referer-Check" class="headerlink" title="Referer Check"></a>Referer Check</h3><p>根据HTTP协议，在HTTP头中有一个字段叫Referer，它记录了该HTTP请求的来源地址。在通常情况下，访问一个安全受限页面的请求必须来自于同一个网站。</p>
+<p>在互联网中，Referer Check的常见用法是防止图片盗链。同理也可以检查请求是否来自合法的源。</p>
+<p>某银行的转账是通过用户访问 <a href="http://bank.test/test?page=10&amp;userID=101&amp;money=10000" target="_blank" rel="external">http://bank.test/test?page=10&amp;userID=101&amp;money=10000</a> 页面完成，用户必须先登录bank.test，然后通过点击页面上的按钮来触发转账事件。当用户提交请求时，该转账请求的Referer值就会是转账按钮所在页面的URL(本例中，通常是以bank.test域名开头的地址)。而如果攻击者要对银行网站实施CSRF攻击，他只能在自己的网站构造请求，当用户通过攻击者的网站发送请求到银行时，该请求的Referer是指向攻击者的网站，则银行网站拒绝该请求。</p>
+<h3 id="添加Token"><a href="#添加Token" class="headerlink" title="添加Token"></a>添加Token</h3><p>CSRF攻击之所以能够成功，是因为攻击者可以伪造用户的请求，该请求中所有的用户验证信息都存在于Cookie中，因此攻击者可以在不知道这些验证信息的情况下直接利用用户自己的Cookie来通过安全验证。</p>
+<p>由此可知，抵御CSRF攻击的关键在于：在请求中放入攻击者所不能伪造的信息，并且该信息不存在于Cookie之中。鉴于此，系统开发者可以在HTTP请求中以参数的形式加入一个随机产生的token，并在服务器端建立一个拦截器来验证这个token，如果请求中没有token或者token内容不正确，则认为可能是CSRF攻击而拒绝该请求。</p>
+<h1 id="点击劫持"><a href="#点击劫持" class="headerlink" title="点击劫持"></a>点击劫持</h1><p>点击劫持，这个术语是Robert Hansen 和 Jeremiah Grossman这2位安全研究专家给出的；其实在2008年9月，Adobe公司就发表了一份公开演讲，关于点击劫持问题的，因为其Flash产品的缺陷可以被严重的恶意利用。</p>
+<p>点击劫持/UI重定向，是指恶意网站伪造一个看似可信的元素（如PayPal的donate按钮，或一个Send按钮-by Gmail等你可能使用的邮箱网站），根据RSnake and Jeremiah的调查证明，用户点击这些貌似可信的Sites的任何元素都可能触发你的话筒或者摄像头，远程攻击者可同时立即对你进行监控。</p>
+<p>更常用的方法是，攻击者在他控制的网站用框架包含一个可信Sites，剥除掉上下文或者透明化这个Sites，这样他就可以轻易的操控你，而你最后可能就是给他发送转账，或者给他任何特权，而这些操作用户是完全不知晓的，后台进行；更甚的，如果这个恶意站点允许使用JS，那么攻击者可以及其轻松的把隐藏的元素精确地放置在鼠标指针下，这样的话不管用户点哪儿，攻击者都赢了；更更有甚的，攻击者可以在JS被禁用的情况下进行欺骗，只需要骗取用户点击一个链接或者按钮。</p>
+<p>注意：点击劫持在任何浏览器上都存在，因为点击劫持不是浏览器漏洞或者Bug造成的，不能一夜就打上补丁；相反，点击劫持是利用最基本的标准Web特点，在任何位置都能实现，而这种天然缺陷是无法在短时间内改善的。</p>
+<p>点击劫持是一种视觉上的欺骗手段。大概有两种方式，一是攻击者使用一个透明的，不可见的iframe，覆盖在一个网页上，然后诱使用户在该页面上进行操作，此时用户将在不知情的情况下点击透明的iframe页面，可以诱使用户恰好点击在iframe页面的一些功能性按钮上；二是攻击者使用一张图片覆盖在网页，遮挡网页原有位置的含义。</p>
+<h2 id="iframe覆盖"><a href="#iframe覆盖" class="headerlink" title="iframe覆盖"></a>iframe覆盖</h2><p>先写一个src.html，模拟源网页。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div></pre></td><td class="code"><pre><div class="line">&lt;!DOCTYPE HTML&gt;</div><div class="line">&lt;html&gt;</div><div class="line">	&lt;head&gt;</div><div class="line">		&lt;title&gt;原页面&lt;/title&gt;</div><div class="line">		&lt;meta http-equiv=&quot;Content-Type&quot; content=&quot;text/html; charset=utf-8&quot; /&gt;</div><div class="line">		&lt;style&gt; </div><div class="line">			button&#123;</div><div class="line">				  position:absolute;</div><div class="line">				  top: 315px;</div><div class="line">				  left: 462px;</div><div class="line">				  z-index: 1;</div><div class="line">				  width: 72px;</div><div class="line">				  height: 26px;</div><div class="line">			 &#125;</div><div class="line">		&lt;/style&gt;</div><div class="line">	&lt;/head&gt;</div><div class="line">	&lt;body&gt;</div><div class="line">		&lt;button onclick=&quot;func()&quot;&gt;加关注&lt;/button&gt;</div><div class="line">	&lt;/body&gt;</div><div class="line">	</div><div class="line">	&lt;script&gt;</div><div class="line">		function func()&#123;</div><div class="line">			alert(&quot;关注成功！&quot;);</div><div class="line">		&#125;</div><div class="line">	&lt;/script&gt;</div><div class="line"></div><div class="line">&lt;/html&gt;</div></pre></td></tr></table></figure></p>
+<p>这个页面有一个按钮，点击后触发事件。</p>
+<p><img src="/2017/06/21/web安全入门/20170622122127.png" alt="src.html"></p>
+<p>再写一个jack.html，劫持页面。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div></pre></td><td class="code"><pre><div class="line">&lt;!DOCTYPE HTML&gt;</div><div class="line">&lt;html&gt;</div><div class="line">	&lt;head&gt;</div><div class="line">		&lt;title&gt;点击劫持&lt;/title&gt;</div><div class="line">		&lt;meta http-equiv=&quot;Content-Type&quot; content=&quot;text/html; charset=utf-8&quot; /&gt;</div><div class="line">		&lt;style&gt;</div><div class="line">			 html,body,iframe&#123;</div><div class="line">				 display: block;</div><div class="line">				  height: 100%;</div><div class="line">				  width: 100%;</div><div class="line">				  margin: 0;</div><div class="line">				  padding: 0;</div><div class="line">				  border:none;</div><div class="line">			 &#125;</div><div class="line">			 iframe&#123;</div><div class="line">				  opacity:0;</div><div class="line">				  filter:alpha(opacity=0);</div><div class="line">				  position:absolute;</div><div class="line">				  z-index:2;</div><div class="line">			 &#125;</div><div class="line">			 button&#123;</div><div class="line">				  position:absolute;</div><div class="line">				  top: 335px;</div><div class="line">				  left: 462px;</div><div class="line">				  z-index: 1;</div><div class="line">				  width: 72px;</div><div class="line">				  height: 26px;</div><div class="line">			 &#125;</div><div class="line">		&lt;/style&gt;</div><div class="line">	&lt;/head&gt;</div><div class="line">    &lt;body&gt;</div><div class="line">          那些不能说的秘密</div><div class="line">          &lt;button&gt;查看详情&lt;/button&gt;</div><div class="line">          &lt;iframe src=&quot;src.html&quot;&gt;&lt;/iframe&gt;</div><div class="line">     &lt;/body&gt;</div><div class="line">&lt;/html&gt;</div></pre></td></tr></table></figure></p>
+<p>这个页面用一个按钮覆盖了原网页的按钮，用户点击后，实际就点击到了原网页的按钮。</p>
+<p><img src="/2017/06/21/web安全入门/20170622122652.png" alt="jack.html"></p>
+<p>将透明度调一下查看按钮布局</p>
+<p><img src="/2017/06/21/web安全入门/20170622122857.png" alt="透明jack.html"></p>
+<h2 id="图片覆盖"><a href="#图片覆盖" class="headerlink" title="图片覆盖"></a>图片覆盖</h2><p>先在之前的src.html中加入一个logo图片</p>
+<p><img src="/2017/06/21/web安全入门/20170622144144.png" alt="src_logo"></p>
+<p>在jack.html中同样添加一个图片</p>
+<p><img src="/2017/06/21/web安全入门/20170622144407.png" alt="jack_logo"></p>
+<p>调解透明度可以看到背后实际情况</p>
+<p><img src="/2017/06/21/web安全入门/20170622144551.png" alt="透明jack_logo"></p>
+<p>假如LOGO图片对应的链接是某个网站，那么用户点击该图片，就会被链接到假的网站上。</p>
+<p>图片也可以伪装得像正常的链接，按钮；或者图片中构造文字，覆盖在关键位置，可能会改变原有的意思。这种情况下，不需要用户点击，也能达到欺骗的目的，比如覆盖了页面的联系电话。</p>
+<h2 id="防御-2"><a href="#防御-2" class="headerlink" title="防御"></a>防御</h2><h3 id="iframe防御"><a href="#iframe防御" class="headerlink" title="iframe防御"></a>iframe防御</h3><p>通常可以写一段JavaScript代码，以禁止iframe的嵌套。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">if(top.location != location)&#123;</div><div class="line">	top.location = self.location;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>在src中加入该代码，再访问jack.html，发现浏览器自动跳转到了src.html。</p>
+<p>由于是用JavaScript写的，这样的控制能力不是特别强，有许多方法可以绕过它。一个更好的方案是使用一个HTTP头——X-Frame-Options。</p>
+<p>X-Frame-Options可以说是为了解决ClickJacking而生的。</p>
+<p>它有三个可选值</p>
+<ul>
+<li>DENY：浏览器拒绝当前页面加载任何frame页面</li>
+<li>SAMEORIGIN：frame页面的地址只能为同源域名下的页面</li>
+<li>ALLOW-FROM origin：定义允许frame加载的页面地址</li>
+</ul>
+<h3 id="图片防御"><a href="#图片防御" class="headerlink" title="图片防御"></a>图片防御</h3><p>由于&lt;img&gt;标签在很多系统中是对用户开放的，因此在现实中有非常多的站点存在被图片覆盖攻击的可能。在防御时，需要检查用户提交的html代码中，&lt;img&gt;标签的style属性是否可能导致浮出。</p>
+<h1 id="SQL注入"><a href="#SQL注入" class="headerlink" title="SQL注入"></a>SQL注入</h1><h2 id="简介-1"><a href="#简介-1" class="headerlink" title="简介"></a>简介</h2><p>通过把SQL命令插入到Web表单递交或输入域名或页面请求的查询字符串，最终达到欺骗服务器执行恶意的SQL命令。</p>
+<p>具体来说，它是利用现有应用程序，将（恶意）的SQL命令注入到后台数据库引擎执行的能力，它可以通过在Web表单中输入（恶意）SQL语句得到一个存在安全漏洞的网站上的数据库，而不是按照设计者意图去执行SQL语句。</p>
+<h2 id="场景"><a href="#场景" class="headerlink" title="场景"></a>场景</h2><p>比如我们开发了一个登陆模块，查询语句是<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">select * from user where name = $&#123;name&#125; and password = $&#123;password&#125;;</div></pre></td></tr></table></figure></p>
+<p>正常情况下，我们拿到用户输入的用户名和密码拼接出来的语句是<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">select * from user where name = &quot;admin&quot; and password = &quot;123456&quot;;</div></pre></td></tr></table></figure></p>
+<p>如果用户输入用户名为 “xxx” or 1 #，密码随便。那么拼接的语句就变成了<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">select * from user where username = &quot;xxx&quot; or 1 # and password = &quot;123456&quot;;</div></pre></td></tr></table></figure></p>
+<p>“#”会使后面的and password = “123456”变成注释，这个语句会查询出所有用户，所以验证通过，成功登陆了系统。</p>
+<h2 id="防范"><a href="#防范" class="headerlink" title="防范"></a>防范</h2><p>一般来说，从以下几点防范sql注入。</p>
+<ol>
+<li><p>校验用户的输入</p>
+<p> 拿到用户数据后，可以通过正则表达式，限制长度，对引号和”-“,”#”进行转换或过滤等。</p>
+</li>
+<li><p>使用预处理语句</p>
+<p> 不要使用动态拼装SQL，而是使用参数化的SQL或者直接使用存储过程进行数据查询存取。</p>
+<p> 比如之前的例子，在mybatis中，如果使用#{}代替${}，编写的sql如下</p>
+ <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">select * from user where name = #&#123;name&#125; and password = #&#123;password&#125;;</div></pre></td></tr></table></figure>
+<p> 这句话会在程序运行时会先编辑成带参数的sql语句</p>
+ <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">select * from user where name = ? and password = ?;</div></pre></td></tr></table></figure>
+<p> 当用户输入 “xxx” or 1 # 时，实际语句</p>
+ <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">select * from user where name = &quot;&apos;xxx&apos; or 1 #&quot; and password = &quot;123456&quot;;</div></pre></td></tr></table></figure>
+<p> 这样是查不到用户的，所以登陆失败。</p>
+<p> 当然有些地方必须使用$，比如order by name desc，这里的name desc都是传参进来的，直接按照参数字符串本身的含义。</p>
+ <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">select * from gooods order by $&#123;param&#125;;</div></pre></td></tr></table></figure>
+<p> 这种情况下，我们必须严格控制传进来的参数。后台最好写方法确保参数正常。比如</p>
+ <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">   //检验排序字段</div><div class="line">   private String orderColumn(String orderColumn)&#123;</div><div class="line">   	//定义或获取可用排序字段集</div><div class="line">       //判定外部传进来的参数字段是否存在于字段集中</div><div class="line">       //如果存在，返回正确结果字段，不存在可抛出错误。</div><div class="line">   &#125;</div><div class="line">   //检验排序顺序</div><div class="line">   private String orderStringtoOrder(String orderString)&#123;</div><div class="line">	String order = &quot;asc&quot;;</div><div class="line">	if(!orderString.isEmpty() &amp;&amp; orderString.equals(&quot;desc&quot;))&#123;</div><div class="line">		order = &quot;desc&quot;;</div><div class="line">	&#125;</div><div class="line">	return order;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p> 严格控制排序参数的正确性。</p>
+</li>
+<li><p>最小权限策略</p>
+<p> 不要使用管理员权限的数据库连接，为每个应用使用单独的权限有限的数据库连接，保证其正常使用即可。</p>
+<p> 这么做的好处是，即使当前用户被攻破了，入侵者只能获取极小一部分权限，防止危害扩大。</p>
+</li>
+<li><p>加密信息</p>
+<p> 不要把密码等机密信息明文存放，加密或者hash掉密码和敏感的信息。</p>
+</li>
+<li><p>异常提醒</p>
+<p> 有些应用直接返回了异常信息给用户页面，这是很不安全的，通过这些异常信息，使用者可以知道程序栈，数据库类型甚至版本号等信息，这将有利于其进一步攻击。</p>
+<p> 应用的异常信息应该给出尽可能少的提示，最好使用自定义的错误信息对原始错误信息进行包装，把异常信息存放在独立的表中。</p>
+</li>
+</ol>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p>参考书籍：　白帽子讲Web安全<br>参考链接：　<a href="http://www.ruanyifeng.com/blog/2016/04/same-origin-policy.html" target="_blank" rel="external">http://www.ruanyifeng.com/blog/2016/04/same-origin-policy.html</a><br>　　　　　　<a href="http://blog.csdn.net/baidu_24024601/article/details/51957270" target="_blank" rel="external">http://blog.csdn.net/baidu_24024601/article/details/51957270</a><br>　　　　　　<a href="http://www.cnblogs.com/lovesong/p/5248483.html" target="_blank" rel="external">http://www.cnblogs.com/lovesong/p/5248483.html</a><br>　　　　　　<a href="http://blog.csdn.net/stilling2006/article/details/8526458" target="_blank" rel="external">http://blog.csdn.net/stilling2006/article/details/8526458</a><br>　　　　　　<a href="http://blog.csdn.net/baochao95/article/details/52025180" target="_blank" rel="external">http://blog.csdn.net/baochao95/article/details/52025180</a></p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://tenny-peng.github.io/2017/06/19/hessian入门使用/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Tenny Peng">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Tenny's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/2017/06/19/hessian入门使用/" itemprop="url">
+                  hessian入门使用
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-19T16:11:24+08:00">
+                2017-06-19
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/hessian/" itemprop="url" rel="index">
+                    <span itemprop="name">hessian</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>Hessian是caucho公司开发的一种基于二进制RPC协议（Remote Procedure Call protocol）的轻量级远程调用框架。</p>
+<p>在Java中使用Hessian：</p>
+<p>服务器端：</p>
+<ul>
+<li>包含Hessian.jar包</li>
+<li>设计一个接口，用来给客户端调用</li>
+<li>实现该接口的功能</li>
+<li>配置web.xml，配好相应的servlet</li>
+<li>由于使用二进制RPC协议传输数据，对象必须进行序列化，实现Serializable 接口</li>
+<li>对于复杂对象可以使用Map的方法传递</li>
+</ul>
+<p>客户端：</p>
+<ul>
+<li>包含Hessian.jar包</li>
+<li>具有和服务器端结构一样的接口。包括命名空间都最好一样</li>
+<li>利用HessianProxyFactory调用远程接口</li>
+</ul>
+<h1 id="入门例子"><a href="#入门例子" class="headerlink" title="入门例子"></a>入门例子</h1><p>到 <a href="http://hessian.caucho.com/" target="_blank" rel="external">http://hessian.caucho.com/</a> 下载hessian.jar包，我这里使用的是hessian-4.0.51.jar。</p>
+<h2 id="服务器端"><a href="#服务器端" class="headerlink" title="服务器端"></a>服务器端</h2><ol>
+<li>Eclipse新建一个Web工程，命名为HseeionService。将hessian.jar包放入WEB-INF/lib中，并引入之；</li>
+<li><p>创建pojo类；</p>
+ <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line">package app.demo;</div><div class="line"></div><div class="line">import java.io.Serializable;</div><div class="line"></div><div class="line">public class User implements Serializable &#123;</div><div class="line"></div><div class="line">    private static final long serialVersionUID = 153519254199840035L;</div><div class="line"></div><div class="line">    String userName = &quot;soopy&quot;;</div><div class="line"></div><div class="line">    String password = &quot;showme&quot;;</div><div class="line"></div><div class="line">    public User(String user, String pwd)&#123;</div><div class="line">        this.userName = user;</div><div class="line">        this.password = pwd;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    public String getUserName()&#123;</div><div class="line">        return userName;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    public String getPassword()&#123;</div><div class="line">        return password;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+<li><p>创建接口</p>
+ <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">package app.demo;</div><div class="line"></div><div class="line">public interface BasicAPI &#123;</div><div class="line">    public void setGreeting(String greeting);</div><div class="line">    public String hello();</div><div class="line">    public User getUser();</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+<li><p>实现接口</p>
+ <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line">package app.demo;</div><div class="line"></div><div class="line">public class BasicService implements BasicAPI &#123;</div><div class="line"></div><div class="line">    private String _greeting = &quot;Hello, world&quot;;</div><div class="line"></div><div class="line">    @Override</div><div class="line">    public void setGreeting(String greeting) &#123;</div><div class="line">        _greeting = greeting;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @Override</div><div class="line">    public String hello() &#123;</div><div class="line">        return _greeting;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @Override</div><div class="line">    public User getUser() &#123;</div><div class="line">        return new User(&quot;prance&quot;, &quot;meshow&quot;);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+<li><p>配置web.xml</p>
+ <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</div><div class="line">&lt;web-app xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</div><div class="line">         xmlns=&quot;http://java.sun.com/xml/ns/javaee&quot;</div><div class="line">         xsi:schemaLocation=&quot;http://java.sun.com/xml/ns/javaee</div><div class="line">                             http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd&quot;</div><div class="line">         id=&quot;WebApp_ID&quot;</div><div class="line">         version=&quot;3.0&quot;&gt;</div><div class="line">  &lt;servlet&gt;</div><div class="line">    &lt;servlet-name&gt;hello&lt;/servlet-name&gt;</div><div class="line">    &lt;servlet-class&gt;com.caucho.hessian.server.HessianServlet&lt;/servlet-class&gt;</div><div class="line">    &lt;init-param&gt;</div><div class="line">      &lt;param-name&gt;service-class&lt;/param-name&gt;</div><div class="line">      &lt;param-value&gt;app.demo.BasicService&lt;/param-value&gt;</div><div class="line">    &lt;/init-param&gt;</div><div class="line">  &lt;/servlet&gt;</div><div class="line">  &lt;servlet-mapping&gt;</div><div class="line">    &lt;servlet-name&gt;hello&lt;/servlet-name&gt;</div><div class="line">    &lt;url-pattern&gt;/hello&lt;/url-pattern&gt;</div><div class="line">  &lt;/servlet-mapping&gt;</div><div class="line">&lt;/web-app&gt;</div></pre></td></tr></table></figure>
+</li>
+<li><p>服务器测试test.jsp</p>
+ <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">&lt;%@ page import=&quot;com.caucho.hessian.client.HessianProxyFactory,app.demo.BasicAPI&quot;%&gt;</div><div class="line">&lt;%@page language=&quot;java&quot;%&gt;</div><div class="line">&lt;%</div><div class="line">HessianProxyFactory factory = new HessianProxyFactory();</div><div class="line">String url = (&quot;http://&quot; +request.getServerName() + &quot;:&quot; +request.getServerPort() +</div><div class="line">request.getContextPath() + &quot;/hello&quot;);</div><div class="line">out.println(url);</div><div class="line">out.println(&quot;&lt;br&gt;&quot;);</div><div class="line">BasicAPI basic = (BasicAPI) factory.create(BasicAPI.class,url);</div><div class="line">out.println(&quot;Hello: &quot; + basic.hello());</div><div class="line">out.println(&quot;&lt;br&gt;&quot;);</div><div class="line">out.println(&quot;Hello: &quot; + basic.getUser() .getUserName() );</div><div class="line">out.println(&quot;&lt;br&gt;&quot;);</div><div class="line">out.println(&quot;Hello: &quot; +basic.getUser().getPassword() );</div><div class="line">%&gt;</div></pre></td></tr></table></figure>
+</li>
+<li><p>将HessianService部署到Tomcat等服务器上，访问 <a href="http://localhost:8080/HessianService/test.jsp" target="_blank" rel="external">http://localhost:8080/HessianService/test.jsp</a> ，浏览器结果：</p>
+ <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">http://localhost:8080/HessianService/hello</div><div class="line">Hello: Hello, world</div><div class="line">Hello: prance</div><div class="line">Hello: meshow</div></pre></td></tr></table></figure>
+</li>
+</ol>
+<h2 id="客户端"><a href="#客户端" class="headerlink" title="客户端"></a>客户端</h2><ol>
+<li>创建一个工程，命名为HessianClient，同样引入hessian.jar包；</li>
+<li>创建和服务端一样的pojo类；</li>
+<li>创建和服务端一样的接口；</li>
+<li><p>创建客户端</p>
+ <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line">package app.demo;</div><div class="line"></div><div class="line">import java.net.MalformedURLException;</div><div class="line"></div><div class="line">import com.caucho.hessian.client.HessianProxyFactory;</div><div class="line"></div><div class="line">public class BasicClient &#123;</div><div class="line"></div><div class="line">    public static void main(String[] args) throws MalformedURLException &#123;</div><div class="line">        String url =&quot;http://127.0.0.1:8080/HessianService/hello&quot;;</div><div class="line">        HessianProxyFactory factory = new HessianProxyFactory();</div><div class="line">        BasicAPI basic = (BasicAPI) factory.create(BasicAPI.class, url);</div><div class="line">        System.out.println(&quot;Hello:&quot; + basic.hello());</div><div class="line">        System.out.println(&quot;Hello:&quot; + basic.getUser().getUserName());</div><div class="line">        System.out.println(&quot;Hello:&quot; + basic.getUser().getPassword());</div><div class="line">        basic.setGreeting(&quot;HelloGreeting&quot;);</div><div class="line">        System.out.println(&quot;Hello:&quot; + basic.hello());</div><div class="line">    &#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+<li><p>运行客户端代码，控制台结果：</p>
+ <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">Hello:Hello, world</div><div class="line">Hello:prance</div><div class="line">Hello:meshow</div><div class="line">Hello:HelloGreeting</div></pre></td></tr></table></figure>
+</li>
+</ol>
+<h2 id="说明"><a href="#说明" class="headerlink" title="说明"></a>说明</h2><p>这里服务端和客户端都编写了同样的接口和基础类，只是为了演示简单例子。在实际使用中，应该是服务端将自己的接口及所需类打成jar包给客户端引入调用。</p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://tenny-peng.github.io/2017/06/19/DataTables使用入门/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Tenny Peng">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Tenny's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/2017/06/19/DataTables使用入门/" itemprop="url">
+                  DataTables使用入门
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-19T11:35:03+08:00">
+                2017-06-19
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/DataTables/" itemprop="url" rel="index">
+                    <span itemprop="name">DataTables</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>Datatables是一款jquery表格插件。它是一个高度灵活的工具，可以将任何HTML表格添加高级的交互功能。</p>
+<ul>
+<li>分页，即时搜索和排序</li>
+<li>几乎支持任何数据源：DOM， javascript， Ajax 和 服务器处理</li>
+<li>支持不同主题 DataTables, jQuery UI, Bootstrap, Foundation</li>
+<li>各式各样的扩展: Editor, TableTools, FixedColumns ……</li>
+<li>丰富多样的option和强大的API</li>
+<li>支持国际化</li>
+<li>超过2900+个单元测试</li>
+<li>免费开源 （ MIT license ）！ 商业支持</li>
+<li>更多特性请到<a href="http://www.datatables.club/" target="_blank" rel="external">DataTables中文网</a>查看</li>
+</ul>
+<h1 id="下载"><a href="#下载" class="headerlink" title="下载"></a>下载</h1><p>可以到<a href="http://www.datatables.club/" target="_blank" rel="external">DataTables中文网</a>下载最新版本的文档。</p>
+<p>下载完目录如下：<br><img src="/2017/06/19/DataTables使用入门/20170619120130.png" alt="DataTables目录"></p>
+<p>我们将使用media目录下的文件。<br><img src="/2017/06/19/DataTables使用入门/20170619120519.png" alt="media目录"></p>
+<h1 id="简单使用"><a href="#简单使用" class="headerlink" title="简单使用"></a>简单使用</h1><p>在项目中使用Datatables，只需要引用三个文件即可，jQuery库，一个DT的核心js文件和一个DT的css文件。</p>
+<h2 id="demo目录"><a href="#demo目录" class="headerlink" title="demo目录"></a>demo目录</h2><p><img src="/2017/06/19/DataTables使用入门/20170619122034.png" alt="demo目录"></p>
+<h2 id="demo-html"><a href="#demo-html" class="headerlink" title="demo.html"></a>demo.html</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">&lt;!DOCTYPE HTML&gt;</div><div class="line">&lt;html&gt;</div><div class="line">	&lt;head&gt;</div><div class="line">		&lt;title&gt;DataTables Demo&lt;/title&gt;</div><div class="line">		&lt;meta http-equiv=&quot;Content-Type&quot; content=&quot;text/html; charset=utf-8&quot; /&gt;</div><div class="line">		&lt;link rel=&quot;stylesheet&quot; href=&quot;css/jquery.dataTables.css&quot;&gt;&lt;/link&gt;</div><div class="line">	&lt;/head&gt;</div><div class="line">	&lt;body&gt;</div><div class="line">		&lt;table id=&quot;table_id_example&quot; class=&quot;display&quot;&gt;</div><div class="line">			&lt;caption&gt;最近交易记录&lt;/caption&gt;</div><div class="line">		&lt;/table&gt;</div><div class="line">	&lt;/body&gt;</div><div class="line">	</div><div class="line">	&lt;script src=&quot;js/jquery.js&quot;&gt;&lt;/script&gt;</div><div class="line">	&lt;script src=&quot;js/jquery.dataTables.js&quot;&gt;&lt;/script&gt;</div><div class="line">	&lt;script src=&quot;js/demo.js&quot;&gt;&lt;/script&gt;</div><div class="line">&lt;/html&gt;</div></pre></td></tr></table></figure>
+<h2 id="demo-js"><a href="#demo-js" class="headerlink" title="demo.js"></a>demo.js</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div><div class="line">98</div><div class="line">99</div><div class="line">100</div><div class="line">101</div><div class="line">102</div><div class="line">103</div><div class="line">104</div><div class="line">105</div><div class="line">106</div><div class="line">107</div><div class="line">108</div><div class="line">109</div><div class="line">110</div><div class="line">111</div><div class="line">112</div><div class="line">113</div><div class="line">114</div><div class="line">115</div><div class="line">116</div><div class="line">117</div><div class="line">118</div><div class="line">119</div><div class="line">120</div><div class="line">121</div><div class="line">122</div><div class="line">123</div><div class="line">124</div><div class="line">125</div><div class="line">126</div><div class="line">127</div><div class="line">128</div><div class="line">129</div><div class="line">130</div><div class="line">131</div><div class="line">132</div><div class="line">133</div><div class="line">134</div><div class="line">135</div></pre></td><td class="code"><pre><div class="line">$(document).ready( function () &#123;</div><div class="line">	var data = [</div><div class="line">        [</div><div class="line">            &quot;20170527150032890&quot;,</div><div class="line">            &quot;-0.10  CNY&quot;,</div><div class="line">            &quot;提现&quot;,</div><div class="line">            &quot;失败&quot;,</div><div class="line">            &quot;2017-05-27 15:00:32&quot;,</div><div class="line">            &quot;提现&quot;,</div><div class="line">			&quot;&quot;</div><div class="line">        ],</div><div class="line">        [</div><div class="line">            &quot;20170527145824609&quot;,</div><div class="line">            &quot;-3.00  CNY&quot;,</div><div class="line">            &quot;冻结&quot;,</div><div class="line">            &quot;成功&quot;,</div><div class="line">            &quot;2017-05-27 14:58:24&quot;,</div><div class="line">            &quot;冻结金额&quot;,</div><div class="line">			&quot;&quot;</div><div class="line">        ],</div><div class="line">		[</div><div class="line">            &quot;20170527145704263&quot;,</div><div class="line">            &quot;-3.00  CNY&quot;,</div><div class="line">            &quot;提现&quot;,</div><div class="line">            &quot;失败&quot;,</div><div class="line">            &quot;2017-05-27 14:57:04&quot;,</div><div class="line">            &quot;提现&quot;,</div><div class="line">			&quot;&quot;</div><div class="line">        ],</div><div class="line">		[</div><div class="line">			&quot;20170527145226988&quot;,</div><div class="line">			&quot;-100.00  CNY&quot;,</div><div class="line">			&quot;冻结&quot;,</div><div class="line">            &quot;成功&quot;,</div><div class="line">			&quot;2017-05-27 14:52:26&quot;,</div><div class="line">			&quot;冻结金额&quot;,</div><div class="line">			&quot;&quot;</div><div class="line">		],</div><div class="line">		[</div><div class="line">			&quot;20170525121845479&quot;,</div><div class="line">			&quot;-0.01 CNY&quot;,</div><div class="line">			&quot;提现&quot;,</div><div class="line">            &quot;已受理&quot;,</div><div class="line">			&quot;2017-05-27 09:28:09&quot;,</div><div class="line">			&quot;重新提现&quot;,</div><div class="line">			&quot;&lt;button class=&apos;btn btn-warning btn-block&apos; onclick=alert(&apos;haha&apos;) &gt;取消提现&lt;/button&gt;&quot;</div><div class="line">		],</div><div class="line">		[</div><div class="line">			&quot;20170527144117493&quot;,</div><div class="line">			&quot;-0.11 CNY&quot;,</div><div class="line">			&quot;提现&quot;,</div><div class="line">            &quot;成功&quot;,</div><div class="line">			&quot;2017-05-27 00:00:00&quot;,</div><div class="line">			&quot;虚拟提现(冻结金额)&quot;,</div><div class="line">			&quot;&quot;</div><div class="line">		],</div><div class="line">		[</div><div class="line">			&quot;20170526165926389&quot;,</div><div class="line">			&quot;-12.00 CNY&quot;,</div><div class="line">			&quot;提现&quot;,</div><div class="line">            &quot;已受理&quot;,</div><div class="line">			&quot;2017-05-26 16:59:26&quot;,</div><div class="line">			&quot;提现&quot;,</div><div class="line">			&quot;&lt;button class=&apos;btn btn-warning btn-block&apos; onclick=alert(&apos;haha&apos;) &gt;取消提现&lt;/button&gt;&quot;</div><div class="line">		],</div><div class="line">		[</div><div class="line">			&quot;20170526165802358&quot;,</div><div class="line">			&quot;-2.00 CNY&quot;,</div><div class="line">			&quot;提现&quot;,</div><div class="line">            &quot;已受理&quot;,</div><div class="line">			&quot;2017-05-26 16:58:02&quot;,</div><div class="line">			&quot;提现&quot;,</div><div class="line">			&quot;&quot;</div><div class="line">		],</div><div class="line">		[</div><div class="line">			&quot;20170526165520190&quot;,</div><div class="line">			&quot;-1.00 CNY&quot;,</div><div class="line">			&quot;提现&quot;,</div><div class="line">            &quot;已受理&quot;,</div><div class="line">			&quot;2017-05-26 16:55:20&quot;,</div><div class="line">			&quot;提现&quot;,</div><div class="line">			&quot;&lt;button class=&apos;btn btn-warning btn-block&apos; onclick=alert(&apos;haha&apos;) &gt;取消提现&lt;/button&gt;&quot;</div><div class="line">		],</div><div class="line">		[</div><div class="line">			&quot;20170526161241519&quot;,</div><div class="line">			&quot;-1.00 CNY&quot;,</div><div class="line">			&quot;提现&quot;,</div><div class="line">            &quot;已受理&quot;,</div><div class="line">			&quot;2017-05-26 16:12:41&quot;,</div><div class="line">			&quot;提现&quot;,</div><div class="line">			&quot;&quot;</div><div class="line">		],</div><div class="line">		[</div><div class="line">			&quot;20170526165802358&quot;,</div><div class="line">			&quot;-99.00 CNY&quot;,</div><div class="line">			&quot;提现&quot;,</div><div class="line">            &quot;已受理&quot;,</div><div class="line">			&quot;2017-05-26 16:58:02&quot;,</div><div class="line">			&quot;提现&quot;,</div><div class="line">			&quot;&quot;</div><div class="line">		],</div><div class="line">		[</div><div class="line">			&quot;20170526165520190&quot;,</div><div class="line">			&quot;-99.00 CNY&quot;,</div><div class="line">			&quot;提现&quot;,</div><div class="line">            &quot;已受理&quot;,</div><div class="line">			&quot;2017-05-26 16:55:20&quot;,</div><div class="line">			&quot;提现&quot;,</div><div class="line">			&quot;&quot;</div><div class="line">		],</div><div class="line">		[</div><div class="line">			&quot;20170526161241519&quot;,</div><div class="line">			&quot;-99.00 CNY&quot;,</div><div class="line">			&quot;提现&quot;,</div><div class="line">            &quot;已受理&quot;,</div><div class="line">			&quot;2017-05-26 16:12:41&quot;,</div><div class="line">			&quot;提现&quot;,</div><div class="line">			&quot;&quot;</div><div class="line">		]</div><div class="line">    ];</div><div class="line"></div><div class="line">    //DataTables 初始化</div><div class="line">    $(&apos;#table_id_example&apos;).DataTable( &#123;</div><div class="line">		data: data,</div><div class="line">		columns: [</div><div class="line">            &#123; title: &apos;批次号&apos; &#125;,</div><div class="line">            &#123; title: &apos;金额&apos; &#125;,</div><div class="line">            &#123; title: &apos;交易类型&apos; &#125;,</div><div class="line">            &#123; title: &apos;交易状态&apos; &#125;,</div><div class="line">			&#123; title: &apos;交易时间&apos; &#125;,</div><div class="line">			&#123; title: &apos;交易信息&apos; &#125;,</div><div class="line">			&#123; title: &apos;操作&apos; &#125;</div><div class="line">        ]</div><div class="line">    &#125; );</div><div class="line">&#125; );</div></pre></td></tr></table></figure>
+<h2 id="结果"><a href="#结果" class="headerlink" title="结果"></a>结果</h2><p><img src="/2017/06/19/DataTables使用入门/20170619121636.png" alt="简单使用结果"></p>
+<h2 id="添加国际化"><a href="#添加国际化" class="headerlink" title="添加国际化"></a>添加国际化</h2><p>Datatables中所使用的语言选项是通过 language 来配置的。 这是一个对象字符串，通过一个参数来描述Datatables的每个部分。</p>
+<p>Datatables默认的是英语，这里我们改成中文。在demo.js文件添加 language 配置项，使其DataTables初始化代码像这样：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div></pre></td><td class="code"><pre><div class="line">//DataTables 初始化</div><div class="line">$(&apos;#table_id_example&apos;).DataTable( &#123;</div><div class="line">    data: data,</div><div class="line">    columns: [</div><div class="line">        &#123; title: &apos;批次号&apos; &#125;,</div><div class="line">        &#123; title: &apos;金额&apos; &#125;,</div><div class="line">        &#123; title: &apos;交易类型&apos; &#125;,</div><div class="line">        &#123; title: &apos;交易状态&apos; &#125;,</div><div class="line">        &#123; title: &apos;交易时间&apos; &#125;,</div><div class="line">        &#123; title: &apos;交易信息&apos; &#125;,</div><div class="line">        &#123; title: &apos;操作&apos; &#125;</div><div class="line">    ],</div><div class="line">    // 国际化</div><div class="line">    language: &#123;</div><div class="line">        &quot;sProcessing&quot;: &quot;处理中...&quot;,</div><div class="line">        &quot;sLengthMenu&quot;: &quot;显示 _MENU_ 项结果&quot;,</div><div class="line">        &quot;sZeroRecords&quot;: &quot;没有匹配结果&quot;,</div><div class="line">        &quot;sInfo&quot;: &quot;显示第 _START_ 至 _END_ 项结果，共 _TOTAL_ 项&quot;,</div><div class="line">        &quot;sInfoEmpty&quot;: &quot;显示第 0 至 0 项结果，共 0 项&quot;,</div><div class="line">        &quot;sInfoFiltered&quot;: &quot;(由 _MAX_ 项结果过滤)&quot;,</div><div class="line">        &quot;sInfoPostFix&quot;: &quot;&quot;,</div><div class="line">        &quot;sSearch&quot;: &quot;搜索:&quot;,</div><div class="line">        &quot;sUrl&quot;: &quot;&quot;,</div><div class="line">        &quot;sEmptyTable&quot;: &quot;表中数据为空&quot;,</div><div class="line">        &quot;sLoadingRecords&quot;: &quot;载入中...&quot;,</div><div class="line">        &quot;sInfoThousands&quot;: &quot;,&quot;,</div><div class="line">        &quot;oPaginate&quot;: &#123;</div><div class="line">            &quot;sFirst&quot;: &quot;首页&quot;,</div><div class="line">            &quot;sPrevious&quot;: &quot;上页&quot;,</div><div class="line">            &quot;sNext&quot;: &quot;下页&quot;,</div><div class="line">            &quot;sLast&quot;: &quot;末页&quot;</div><div class="line">        &#125;,</div><div class="line">        &quot;oAria&quot;: &#123;</div><div class="line">            &quot;sSortAscending&quot;: &quot;: 以升序排列此列&quot;,</div><div class="line">            &quot;sSortDescending&quot;: &quot;: 以降序排列此列&quot;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125; );</div></pre></td></tr></table></figure></p>
+<p>结果如图<br><img src="/2017/06/19/DataTables使用入门/20170619122557.png" alt="国际化"></p>
+<h2 id="关于表列"><a href="#关于表列" class="headerlink" title="关于表列"></a>关于表列</h2><p>上面我们的写法是动态添加title<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">columns: [</div><div class="line">    &#123; title: &apos;批次号&apos; &#125;,</div><div class="line">    &#123; title: &apos;金额&apos; &#125;,</div><div class="line">    &#123; title: &apos;交易类型&apos; &#125;,</div><div class="line">    &#123; title: &apos;交易状态&apos; &#125;,</div><div class="line">    &#123; title: &apos;交易时间&apos; &#125;,</div><div class="line">    &#123; title: &apos;交易信息&apos; &#125;,</div><div class="line">    &#123; title: &apos;操作&apos; &#125;</div><div class="line">]</div></pre></td></tr></table></figure></p>
+<p>官网是另一种写法，首先在table里写好表列字段名，如：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">&lt;thead&gt;</div><div class="line">    &lt;tr&gt;</div><div class="line">        &lt;th&gt;name&lt;/th&gt;</div><div class="line">        &lt;th&gt;position&lt;/th&gt;</div><div class="line">        &lt;th&gt;salary&lt;/th&gt;</div><div class="line">        &lt;th&gt;office&lt;/th&gt;</div><div class="line">    &lt;/tr&gt;</div><div class="line">&lt;/thead&gt;</div></pre></td></tr></table></figure></p>
+<p>然后上面columns写法稍微有点不同<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">columns: [</div><div class="line">    &#123; data: &apos;name&apos; &#125;,</div><div class="line">    &#123; data: &apos;position&apos; &#125;,</div><div class="line">    &#123; data: &apos;salary&apos; &#125;,</div><div class="line">    &#123; data: &apos;office&apos; &#125;</div><div class="line">]</div></pre></td></tr></table></figure></p>
+<p>这样也是完全OK的，具体怎么用看自己喜好和实际业务了。</p>
+<h1 id="服务器支持"><a href="#服务器支持" class="headerlink" title="服务器支持"></a>服务器支持</h1><p>一次性处理大量数据DataTables性能会下降，因为 DT 需要渲染，数据越多，速度就越慢。</p>
+<p>为了解决这个问题， DataTables 提供了服务器模式，把本来客户端所做的事情交给服务器去处理， 比如排序（order）、分页（paging）、过滤（filter）。</p>
+<p>启用服务器模式时，每次请求 DataTables 会向服务器发送一些参数（当前分页，排序，搜索参数等），服务器则返回组装好的数据。</p>
+<h2 id="demo-html-1"><a href="#demo-html-1" class="headerlink" title="demo.html"></a>demo.html</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line">&lt;!DOCTYPE HTML&gt;</div><div class="line">&lt;html&gt;</div><div class="line">	&lt;head&gt;</div><div class="line">		&lt;title&gt;DataTables Demo&lt;/title&gt;</div><div class="line">		&lt;meta http-equiv=&quot;Content-Type&quot; content=&quot;text/html; charset=utf-8&quot; /&gt;</div><div class="line">		&lt;link rel=&quot;stylesheet&quot; href=&quot;css/jquery.dataTables.css&quot;&gt;&lt;/link&gt;</div><div class="line">	&lt;/head&gt;</div><div class="line">	&lt;body&gt;</div><div class="line">		&lt;table id=&quot;city&quot; class=&quot;display&quot;&gt;</div><div class="line">			&lt;caption&gt;city&lt;/caption&gt;</div><div class="line">			&lt;thead&gt;</div><div class="line">				&lt;tr&gt;</div><div class="line">					&lt;th&gt;id&lt;/th&gt;</div><div class="line">					&lt;th&gt;name&lt;/th&gt;</div><div class="line">					&lt;th&gt;countryCode&lt;/th&gt;</div><div class="line">					&lt;th&gt;district&lt;/th&gt;</div><div class="line">					&lt;th&gt;population&lt;/th&gt;</div><div class="line">				&lt;/tr&gt;</div><div class="line">			&lt;/thead&gt;</div><div class="line">		&lt;/table&gt;</div><div class="line">	&lt;/body&gt;</div><div class="line">	</div><div class="line">	&lt;script src=&quot;js/jquery.js&quot;&gt;&lt;/script&gt;</div><div class="line">	&lt;script src=&quot;js/jquery.dataTables.js&quot;&gt;&lt;/script&gt;</div><div class="line">	&lt;script src=&quot;js/demo.js&quot;&gt;&lt;/script&gt;</div><div class="line">&lt;/html&gt;</div></pre></td></tr></table></figure>
+<h2 id="demo-js-1"><a href="#demo-js-1" class="headerlink" title="demo.js"></a>demo.js</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div></pre></td><td class="code"><pre><div class="line">$(document).ready( function () &#123;</div><div class="line">    //DataTables 初始化</div><div class="line">    $(&apos;#country&apos;).DataTable( &#123;</div><div class="line">		&quot;processing&quot;: true,		//开启加载等待提示，提示信息是下面language中的sProcessing配置</div><div class="line">        &quot;serverSide&quot;: true,		//打开服务器模式</div><div class="line">		&quot;ajax&quot;: &#123;</div><div class="line">			&quot;url&quot;: &quot;city/getall&quot;,</div><div class="line">			&quot;type&quot;: &quot;POST&quot;,</div><div class="line">			&quot;data&quot;: function(d)&#123;	//d包含了DataTables发送到服务器的参数，这里还可以根据自己的业务添加参数</div><div class="line">                //可以自定义一些业务参数</div><div class="line">                //d.xxx = &quot;xxx&quot;;</div><div class="line">			&#125;</div><div class="line">		&#125;,</div><div class="line">		&quot;columns&quot;: [</div><div class="line">            &#123; &quot;data&quot;: &apos;id&apos; &#125;,</div><div class="line">            &#123; &quot;data&quot;: &apos;name&apos; &#125;,</div><div class="line">            &#123; &quot;data&quot;: &apos;countryCode&apos; &#125;,</div><div class="line">            &#123; &quot;data&quot;: &apos;district&apos; &#125;,</div><div class="line">			&#123; &quot;data&quot;: &apos;population&apos; &#125;</div><div class="line">        ],</div><div class="line">		// 国际化</div><div class="line">		language: &#123;</div><div class="line">			&quot;sProcessing&quot;: &quot;处理中...&quot;,</div><div class="line">			&quot;sLengthMenu&quot;: &quot;显示 _MENU_ 项结果&quot;,</div><div class="line">			&quot;sZeroRecords&quot;: &quot;没有匹配结果&quot;,</div><div class="line">			&quot;sInfo&quot;: &quot;显示第 _START_ 至 _END_ 项结果，共 _TOTAL_ 项&quot;,</div><div class="line">			&quot;sInfoEmpty&quot;: &quot;显示第 0 至 0 项结果，共 0 项&quot;,</div><div class="line">			&quot;sInfoFiltered&quot;: &quot;(由 _MAX_ 项结果过滤)&quot;,</div><div class="line">			&quot;sInfoPostFix&quot;: &quot;&quot;,</div><div class="line">			&quot;sSearch&quot;: &quot;搜索:&quot;,</div><div class="line">			&quot;sUrl&quot;: &quot;&quot;,</div><div class="line">			&quot;sEmptyTable&quot;: &quot;表中数据为空&quot;,</div><div class="line">			&quot;sLoadingRecords&quot;: &quot;载入中...&quot;,</div><div class="line">			&quot;sInfoThousands&quot;: &quot;,&quot;,</div><div class="line">			&quot;oPaginate&quot;: &#123;</div><div class="line">				&quot;sFirst&quot;: &quot;首页&quot;,</div><div class="line">				&quot;sPrevious&quot;: &quot;上页&quot;,</div><div class="line">				&quot;sNext&quot;: &quot;下页&quot;,</div><div class="line">				&quot;sLast&quot;: &quot;末页&quot;</div><div class="line">			&#125;,</div><div class="line">			&quot;oAria&quot;: &#123;</div><div class="line">				&quot;sSortAscending&quot;: &quot;: 以升序排列此列&quot;,</div><div class="line">				&quot;sSortDescending&quot;: &quot;: 以降序排列此列&quot;</div><div class="line">			&#125;</div><div class="line">		&#125;</div><div class="line">    &#125; );</div><div class="line">&#125; );</div></pre></td></tr></table></figure>
+<h2 id="查看结果"><a href="#查看结果" class="headerlink" title="查看结果"></a>查看结果</h2><p><img src="/2017/06/19/DataTables使用入门/20170619144830.png" alt="服务器模式"><br>在浏览器调试窗口，我们可以看到发送到后台的参数(即上面ajax请求中d的数据)：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div></pre></td><td class="code"><pre><div class="line">draw:1	//确保Ajax从服务器返回的是对应的，服务器接收到此参数后再返回</div><div class="line">columns[0][data]:id</div><div class="line">columns[0][name]:</div><div class="line">columns[0][searchable]:true</div><div class="line">columns[0][orderable]:true</div><div class="line">columns[0][search][value]:</div><div class="line">columns[0][search][regex]:false</div><div class="line">columns[1][data]:name</div><div class="line">columns[1][name]:</div><div class="line">columns[1][searchable]:true</div><div class="line">columns[1][orderable]:true</div><div class="line">columns[1][search][value]:</div><div class="line">columns[1][search][regex]:false</div><div class="line">columns[2][data]:countryCode</div><div class="line">columns[2][name]:</div><div class="line">columns[2][searchable]:true</div><div class="line">columns[2][orderable]:true</div><div class="line">columns[2][search][value]:</div><div class="line">columns[2][search][regex]:false</div><div class="line">columns[3][data]:district</div><div class="line">columns[3][name]:</div><div class="line">columns[3][searchable]:true</div><div class="line">columns[3][orderable]:true</div><div class="line">columns[3][search][value]:</div><div class="line">columns[3][search][regex]:false</div><div class="line">columns[4][data]:population</div><div class="line">columns[4][name]:</div><div class="line">columns[4][searchable]:true</div><div class="line">columns[4][orderable]:true</div><div class="line">columns[4][search][value]:</div><div class="line">columns[4][search][regex]:false</div><div class="line">order[0][column]:0	//告诉后台那些列是需要排序的</div><div class="line">order[0][dir]:asc	//告诉后台列排序的方式， desc 降序 asc 升序</div><div class="line">start:0	//第一条数据的起始位置，比如0代表第一条数据</div><div class="line">length:10	//告诉服务器每页显示的条数</div><div class="line">search[value]:	//全局的搜索条件，此demo为空</div><div class="line">search[regex]:false	//为true代表全局搜索的值是作为正则表达式处理</div></pre></td></tr></table></figure></p>
+<p>服务器返回的数据<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">    &quot;recordsFiltered&quot;: 4079,	//过滤后的记录数</div><div class="line">    &quot;data&quot;: [	//表格中需要显示的数据。</div><div class="line">        &#123;</div><div class="line">            &quot;countryCode&quot;: &quot;AFG&quot;,</div><div class="line">            &quot;district&quot;: &quot;Kabol&quot;,</div><div class="line">            &quot;name&quot;: &quot;Kabul&quot;,</div><div class="line">            &quot;id&quot;: 1,</div><div class="line">            &quot;population&quot;: 1780000</div><div class="line">        &#125;,</div><div class="line">        &#123;</div><div class="line">            &quot;countryCode&quot;: &quot;AFG&quot;,</div><div class="line">            &quot;district&quot;: &quot;Qandahar&quot;,</div><div class="line">            &quot;name&quot;: &quot;Qandahar&quot;,</div><div class="line">            &quot;id&quot;: 2,</div><div class="line">            &quot;population&quot;: 237500</div><div class="line">        &#125;,</div><div class="line">        &#123;</div><div class="line">            &quot;countryCode&quot;: &quot;AFG&quot;,</div><div class="line">            &quot;district&quot;: &quot;Herat&quot;,</div><div class="line">            &quot;name&quot;: &quot;Herat&quot;,</div><div class="line">            &quot;id&quot;: 3,</div><div class="line">            &quot;population&quot;: 186800</div><div class="line">        &#125;,</div><div class="line">        &#123;</div><div class="line">            &quot;countryCode&quot;: &quot;AFG&quot;,</div><div class="line">            &quot;district&quot;: &quot;Balkh&quot;,</div><div class="line">            &quot;name&quot;: &quot;Mazar-e-Sharif&quot;,</div><div class="line">            &quot;id&quot;: 4,</div><div class="line">            &quot;population&quot;: 127800</div><div class="line">        &#125;,</div><div class="line">        &#123;</div><div class="line">            &quot;countryCode&quot;: &quot;NLD&quot;,</div><div class="line">            &quot;district&quot;: &quot;Noord-Holland&quot;,</div><div class="line">            &quot;name&quot;: &quot;Amsterdam&quot;,</div><div class="line">            &quot;id&quot;: 5,</div><div class="line">            &quot;population&quot;: 731200</div><div class="line">        &#125;,</div><div class="line">        &#123;</div><div class="line">            &quot;countryCode&quot;: &quot;NLD&quot;,</div><div class="line">            &quot;district&quot;: &quot;Zuid-Holland&quot;,</div><div class="line">            &quot;name&quot;: &quot;Rotterdam&quot;,</div><div class="line">            &quot;id&quot;: 6,</div><div class="line">            &quot;population&quot;: 593321</div><div class="line">        &#125;,</div><div class="line">        &#123;</div><div class="line">            &quot;countryCode&quot;: &quot;NLD&quot;,</div><div class="line">            &quot;district&quot;: &quot;Zuid-Holland&quot;,</div><div class="line">            &quot;name&quot;: &quot;Haag&quot;,</div><div class="line">            &quot;id&quot;: 7,</div><div class="line">            &quot;population&quot;: 440900</div><div class="line">        &#125;,</div><div class="line">        &#123;</div><div class="line">            &quot;countryCode&quot;: &quot;NLD&quot;,</div><div class="line">            &quot;district&quot;: &quot;Utrecht&quot;,</div><div class="line">            &quot;name&quot;: &quot;Utrecht&quot;,</div><div class="line">            &quot;id&quot;: 8,</div><div class="line">            &quot;population&quot;: 234323</div><div class="line">        &#125;,</div><div class="line">        &#123;</div><div class="line">            &quot;countryCode&quot;: &quot;NLD&quot;,</div><div class="line">            &quot;district&quot;: &quot;Noord-Brabant&quot;,</div><div class="line">            &quot;name&quot;: &quot;Eindhoven&quot;,</div><div class="line">            &quot;id&quot;: 9,</div><div class="line">            &quot;population&quot;: 201843</div><div class="line">        &#125;,</div><div class="line">        &#123;</div><div class="line">            &quot;countryCode&quot;: &quot;NLD&quot;,</div><div class="line">            &quot;district&quot;: &quot;Noord-Brabant&quot;,</div><div class="line">            &quot;name&quot;: &quot;Tilburg&quot;,</div><div class="line">            &quot;id&quot;: 10,</div><div class="line">            &quot;population&quot;: 193238</div><div class="line">        &#125;</div><div class="line">    ],</div><div class="line">    &quot;draw&quot;: 1,	//Datatables发送的draw是多少那么服务器就返回多少</div><div class="line">    &quot;recordsTotal&quot;: 4079	//数据库里总共记录数</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p><a href="http://www.datatables.club/manual/server-side.html" target="_blank" rel="external">点此</a>查看更多服务器处理参数。</p>
+<h1 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h1><p>DataTables是一个表格插件。既可以一次性获取大量数据在前端做分页处理（一般不推荐，数据量较大时客户端压力大，处理慢），也可以使用服务器处理分页（只返回当前页面的数据）。</p>
+<p>常用的参数可能就那么几个，我们可以直接使用它们，也可以自己封装参数，比如”search[value]”我们可以改成”keyword”再传给后台，”order[0][column]”可以先在前端转换成对应”orderColumn”再传入后台，还可以加上其它特定的业务参数等。</p>
+<p>其他一些未提及的，比如服务器模式的自定义回调函数，勇敢的去官网或google探索吧。</p>
+<p>总体感觉，使用简单，配置灵活。</p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://tenny-peng.github.io/2017/06/19/MyBatis分页插件PageHelper/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Tenny Peng">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Tenny's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/2017/06/19/MyBatis分页插件PageHelper/" itemprop="url">
+                  MyBatis分页插件PageHelper
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-19T09:55:19+08:00">
+                2017-06-19
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/PageHelper/" itemprop="url" rel="index">
+                    <span itemprop="name">PageHelper</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>PageHelper是一个Mybatis的分页插件，可以方便地对查询结果进行分页和排序。</p>
+<h1 id="在spring-mybatis-中使用-pagehelper"><a href="#在spring-mybatis-中使用-pagehelper" class="headerlink" title="在spring + mybatis 中使用 pagehelper"></a>在spring + mybatis 中使用 pagehelper</h1><h2 id="1-maven添加依赖"><a href="#1-maven添加依赖" class="headerlink" title="1. maven添加依赖"></a>1. maven添加依赖</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">&lt;!-- mybatis 分页插件 --&gt;</div><div class="line">&lt;dependency&gt;</div><div class="line">    &lt;groupId&gt;com.github.pagehelper&lt;/groupId&gt;</div><div class="line">    &lt;artifactId&gt;pagehelper&lt;/artifactId&gt;</div><div class="line">    &lt;version&gt;4.1.4&lt;/version&gt;</div><div class="line">&lt;/dependency&gt;</div></pre></td></tr></table></figure>
+<h2 id="2-编写mybatis-config-xml"><a href="#2-编写mybatis-config-xml" class="headerlink" title="2. 编写mybatis-config.xml"></a>2. 编写mybatis-config.xml</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div></pre></td><td class="code"><pre><div class="line">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; ?&gt;  </div><div class="line">&lt;!DOCTYPE configuration  </div><div class="line">PUBLIC &quot;-//mybatis.org//DTD Config 3.0//EN&quot;  </div><div class="line">&quot;http://mybatis.org/dtd/mybatis-3-config.dtd&quot;&gt;  </div><div class="line">&lt;!-- 配置管理器 --&gt;  </div><div class="line">&lt;configuration&gt;</div><div class="line">    &lt;plugins&gt;  </div><div class="line">        &lt;!-- com.github.pagehelper为PageHelper类所在包名 --&gt;  </div><div class="line">        &lt;plugin interceptor=&quot;com.github.pagehelper.PageHelper&quot;&gt;  </div><div class="line">            &lt;!-- 4.0.0以后版本可以不设置该参数 --&gt;  </div><div class="line">            &lt;property name=&quot;dialect&quot; value=&quot;mysql&quot;/&gt;  </div><div class="line">            &lt;!-- 该参数默认为false --&gt;  </div><div class="line">            &lt;!-- 设置为true时，会将RowBounds第一个参数offset当成pageNum页码使用 --&gt;  </div><div class="line">            &lt;!-- 和startPage中的pageNum效果一样--&gt;  </div><div class="line">            &lt;property name=&quot;offsetAsPageNum&quot; value=&quot;true&quot;/&gt;  </div><div class="line">            &lt;!-- 该参数默认为false --&gt;  </div><div class="line">            &lt;!-- 设置为true时，使用RowBounds分页会进行count查询 --&gt;  </div><div class="line">            &lt;property name=&quot;rowBoundsWithCount&quot; value=&quot;true&quot;/&gt;  </div><div class="line">            &lt;!-- 设置为true时，如果pageSize=0或者RowBounds.limit = 0就会查询出全部的结果 --&gt;  </div><div class="line">            &lt;!-- （相当于没有执行分页查询，但是返回结果仍然是Page类型）--&gt;  </div><div class="line">            &lt;property name=&quot;pageSizeZero&quot; value=&quot;true&quot;/&gt;  </div><div class="line">            &lt;!-- 3.3.0版本可用 - 分页参数合理化，默认false禁用 --&gt;  </div><div class="line">            &lt;!-- 启用合理化时，如果pageNum&lt;1会查询第一页，如果pageNum&gt;pages会查询最后一页 --&gt;  </div><div class="line">            &lt;!-- 禁用合理化时，如果pageNum&lt;1或pageNum&gt;pages会返回空数据 --&gt;  </div><div class="line">            &lt;property name=&quot;reasonable&quot; value=&quot;true&quot;/&gt;  </div><div class="line">            &lt;!-- 3.5.0版本可用 - 为了支持startPage(Object params)方法 --&gt;  </div><div class="line">            &lt;!-- 增加了一个`params`参数来配置参数映射，用于从Map或ServletRequest中取值 --&gt;  </div><div class="line">            &lt;!-- 可以配置pageNum,pageSize,count,pageSizeZero,reasonable,orderBy,不配置映射的用默认值 --&gt;  </div><div class="line">            &lt;!-- 不理解该含义的前提下，不要随便复制该配置 --&gt;  </div><div class="line">            &lt;property name=&quot;params&quot; value=&quot;pageNum=start;pageSize=limit;&quot;/&gt;  </div><div class="line">            &lt;!-- 支持通过Mapper接口参数来传递分页参数 --&gt;  </div><div class="line">            &lt;property name=&quot;supportMethodsArguments&quot; value=&quot;true&quot;/&gt;  </div><div class="line">            &lt;!-- always总是返回PageInfo类型,check检查返回类型是否为PageInfo,none返回Page --&gt;  </div><div class="line">            &lt;property name=&quot;returnPageInfo&quot; value=&quot;check&quot;/&gt;  </div><div class="line">        &lt;/plugin&gt;  </div><div class="line">    &lt;/plugins&gt;  </div><div class="line">&lt;/configuration&gt;</div></pre></td></tr></table></figure>
+<h2 id="3-在spring-mybatis配置文件中引入上述配置"><a href="#3-在spring-mybatis配置文件中引入上述配置" class="headerlink" title="3. 在spring-mybatis配置文件中引入上述配置"></a>3. 在spring-mybatis配置文件中引入上述配置</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">&lt;!-- spring和MyBatis完美整合，不需要mybatis的配置映射文件 --&gt;  </div><div class="line">&lt;bean id=&quot;sqlSessionFactory&quot; class=&quot;org.mybatis.spring.SqlSessionFactoryBean&quot;&gt;  </div><div class="line">    &lt;property name=&quot;dataSource&quot; ref=&quot;dataSource&quot; /&gt;</div><div class="line">    &lt;property name=&quot;configLocation&quot; value=&quot;classpath:mybatis/mybatis-config.xml&quot; /&gt;  </div><div class="line">    &lt;!-- 自动扫描mapping.xml文件 --&gt;  </div><div class="line">    &lt;property name=&quot;mapperLocations&quot; value=&quot;classpath:com/demo/mapping/*.xml&quot;&gt;&lt;/property&gt;  </div><div class="line">&lt;/bean&gt;</div></pre></td></tr></table></figure>
+<h2 id="4-业务逻辑代码"><a href="#4-业务逻辑代码" class="headerlink" title="4. 业务逻辑代码"></a>4. 业务逻辑代码</h2><ol>
+<li><p>mapper.xml</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">&lt;select id=&quot;getAll&quot; resultMap=&quot;BaseResultMap&quot;&gt;</div><div class="line">    SELECT </div><div class="line">    &lt;include refid=&quot;Base_Column_List&quot; /&gt;</div><div class="line">    FROM city</div><div class="line">    WHERE 1 = 1</div><div class="line">    &lt;if test=&quot;pattern != null and pattern != &apos;&apos;&quot;&gt;</div><div class="line">        AND (</div><div class="line">            name like CONCAT(&apos;%&apos;, #&#123;pattern&#125;, &apos;%&apos;)</div><div class="line">            OR</div><div class="line">            countrycode like CONCAT(&apos;%&apos;, #&#123;pattern&#125;, &apos;%&apos;)</div><div class="line">            OR</div><div class="line">            district like CONCAT(&apos;%&apos;, #&#123;pattern&#125;, &apos;%&apos;)</div><div class="line">            OR</div><div class="line">            population like CONCAT(&apos;%&apos;, #&#123;pattern&#125;, &apos;%&apos;)</div><div class="line">        )</div><div class="line">    &lt;/if&gt;</div><div class="line">&lt;/select&gt;</div></pre></td></tr></table></figure>
+</li>
+<li><p>dao</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">public List&lt;Map&lt;String,Object&gt;&gt; getAll(Map&lt;String,Object&gt; params);</div></pre></td></tr></table></figure>
+</li>
+<li><p>service</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">public List&lt;Map&lt;String, Object&gt;&gt; getAll(Map&lt;String,Object&gt; params);</div></pre></td></tr></table></figure>
+</li>
+<li><p>serviceImpl</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">public List&lt;Map&lt;String, Object&gt;&gt; getAll(Map&lt;String,Object&gt; params) &#123;</div><div class="line">    return dao.getAll(params);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+<li><p>controller</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">// 设置分页及排序参数：pageNum,页数，从1开始；pageSize，页面大小，每页查询数据量，如10；orderBy，排序字段及顺序，如&quot;name desc&quot;</div><div class="line">PageHelper.startPage(pageNum, pageSize);</div><div class="line">PageHelper.orderBy(orderBy);</div><div class="line"></div><div class="line">// 业务模糊查询参数</div><div class="line">Map&lt;String, Object&gt; params = new HashMap&lt;String, Object&gt;();</div><div class="line">params.put(&quot;pattern&quot;, patternStr);</div><div class="line"></div><div class="line">// 查询</div><div class="line">List&lt;Map&lt;String, Object&gt;&gt; dataList = cityService.getAll(params);</div><div class="line">PageInfo&lt;Map&lt;String, Object&gt;&gt; pageInfo = new PageInfo&lt;Map&lt;String, Object&gt;&gt;(dataList);</div><div class="line"></div><div class="line">// 结果</div><div class="line">pageInfo.getTotal();// 总结果数，如4079</div><div class="line">pageInfo.getList();// 数据结果，本次查询返回结果，如10个</div></pre></td></tr></table></figure>
+</li>
+<li><p>ajax请求</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">&quot;ajax&quot;: &#123;</div><div class="line">    &quot;url&quot;: &quot;city/getall&quot;,</div><div class="line">    &quot;type&quot;: &quot;POST&quot;,</div><div class="line">    &quot;data&quot;: &#123;</div><div class="line">        pageNum: 1;		//查询第一页</div><div class="line">        pageSize: 10;	//查询10条记录</div><div class="line">        orderColumn: &quot;name&quot;;	// 后台的orderBy通过这里的orderColumn + orderDir拼接而成。</div><div class="line">        orderDir: &quot;desc&quot;;	//但是为了防止sql注入及非法参数，最好后台增加方法判断参数合法性，并返回合法值。</div><div class="line">        pattern: &quot;tenny&quot;;	//业务相关参数，模糊查询</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+</ol>
+<h2 id="查看结果"><a href="#查看结果" class="headerlink" title="查看结果"></a>查看结果</h2><p>通过日志可以看到，插件对sql做了处理：1.先查询一条总数，2.在原sql上加入分页条件进行查询。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">2017-06-19 11:15:38,569 DEBUG [com.demo.dao.ICityDao.getAll_COUNT] - ==&gt;  Preparing: SELECT count(0) FROM city WHERE 1 = 1 </div><div class="line">2017-06-19 11:15:38,601 DEBUG [com.demo.dao.ICityDao.getAll_COUNT] - ==&gt; Parameters: </div><div class="line">2017-06-19 11:15:38,841 DEBUG [com.demo.dao.ICityDao.getAll_COUNT] - &lt;==      Total: 1</div><div class="line">2017-06-19 11:15:38,850 DEBUG [com.demo.dao.ICityDao.getAll] - ==&gt;  Preparing: SELECT id, name, countrycode, district, population FROM city WHERE 1 = 1 order by id asc limit ?,? </div><div class="line">2017-06-19 11:15:38,850 DEBUG [com.demo.dao.ICityDao.getAll] - ==&gt; Parameters: 0(Integer), 10(Integer)</div><div class="line">2017-06-19 11:15:38,854 DEBUG [com.demo.dao.ICityDao.getAll] - &lt;==      Total: 10</div></pre></td></tr></table></figure></p>
+<p>pageInfo封装了查询条件及结果集：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">PageInfo&#123;pageNum=1, pageSize=10, size=10, startRow=1, endRow=10, total=4079, pages=408, list=Page&#123;count=true, pageNum=1, pageSize=10, startRow=0, endRow=10, total=4079, pages=408, countSignal=false, orderBy=&apos;id asc&apos;, orderByOnly=false, reasonable=true, pageSizeZero=true&#125;, firstPage=1, prePage=0, nextPage=2, lastPage=8, isFirstPage=true, isLastPage=false, hasPreviousPage=false, hasNextPage=true, navigatePages=8, navigatepageNums=[1, 2, 3, 4, 5, 6, 7, 8]&#125;</div></pre></td></tr></table></figure></p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
     <link itemprop="mainEntityOfPage" href="https://tenny-peng.github.io/2017/05/04/zookeeper入门/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -412,9 +1266,15 @@
       
         
           
-            <h1 id="zookeeper简介"><a href="#zookeeper简介" class="headerlink" title="zookeeper简介"></a>zookeeper简介</h1><p>Zookeeper 分布式服务框架是 Apache Hadoop 的一个子项目，它主要是用来解决分布式应用中经常遇到的一些数据管理问题，如：统一命名服务、状态同步服务、集群管理、分布式应用配置项的管理等。</p>
-<h1 id="安装和使用"><a href="#安装和使用" class="headerlink" title="安装和使用"></a>安装和使用</h1><p>访问<a href="http://zookeeper.apache.org/releases.html" target="_blank" rel="external">http://zookeeper.apache.org/releases.html</a> 并下载最新版本的ZooKeeper，这里我使用的版本是3.4.8。</p>
+            <h1 id="zookeeper-简介"><a href="#zookeeper-简介" class="headerlink" title="zookeeper 简介"></a>zookeeper 简介</h1><p>Zookeeper 分布式服务框架是 Apache Hadoop 的一个子项目，它主要是用来解决分布式应用中经常遇到的一些数据管理问题，如：统一命名服务、状态同步服务、集群管理、分布式应用配置项的管理等。</p>
+<h1 id="zookeeper-单机使用"><a href="#zookeeper-单机使用" class="headerlink" title="zookeeper 单机使用"></a>zookeeper 单机使用</h1><p>访问<a href="http://zookeeper.apache.org/releases.html" target="_blank" rel="external">http://zookeeper.apache.org/releases.html</a> 并下载最新版本的ZooKeeper，这里我使用的版本是3.4.8。</p>
 <p>下载完成后解压缩。进入conf目录，创建zoo.cfg配置文件(可复制已有的zoo_sample.cfg修改)。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">tickTime=2000</div><div class="line">initLimit=10</div><div class="line">syncLimit=5</div><div class="line">dataDir=/tmp/zookeeper</div><div class="line">clientPort=2181</div></pre></td></tr></table></figure></p>
+<p>说明一下几个配置项的意义(initLimit和syncLimit暂时先不管，后面有说明)：</p>
+<ul>
+<li>tickTime：这个时间是作为 Zookeeper 服务器之间或客户端与服务器之间维持心跳的时间间隔，也就是每个 tickTime 时间就会发送一个心跳。</li>
+<li>dataDir：顾名思义就是 Zookeeper 保存数据的目录，默认情况下，Zookeeper 将写数据的日志文件也保存在这个目录里。</li>
+<li>clientPort：这个端口就是客户端连接 Zookeeper 服务器的端口，Zookeeper 会监听这个端口，接受客户端的访问请求。</li>
+</ul>
 <p>保存配置文件，返回进入bin目录，双击zkService.cmd启动服务，控制台看到如下启动信息：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">...</div><div class="line">2017-05-04 16:42:38,924 [myid:] - INFO  [main:ZooKeeperServer@787] - tickTime set to 2000</div><div class="line">2017-05-04 16:42:38,924 [myid:] - INFO  [main:ZooKeeperServer@796] - minSessionTimeout set to -1</div><div class="line">2017-05-04 16:42:38,925 [myid:] - INFO  [main:ZooKeeperServer@805] - maxSessionTimeout set to -1</div><div class="line">2017-05-04 16:42:38,993 [myid:] - INFO  [main:NIOServerCnxnFactory@89] - binding to port 0.0.0.0/0.0.0.0:2181</div></pre></td></tr></table></figure></p>
 <p>再双击zkCli.cmd启动客户端，控制台显示如下信息：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">...</div><div class="line">WATCHER::</div><div class="line">[zk: localhost:2181(CONNECTED) 0]</div><div class="line">WatchedEvent state:SyncConnected type:None path:null</div></pre></td></tr></table></figure></p>
 <p>ZooKeeper客户端用于与ZooKeeper服务器进行交互，下面来进行简单的操作。</p>
@@ -484,7 +1344,7 @@
 <p>示例：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">[zk: localhost:2181(CONNECTED) 13] rmr /FirstZnode</div><div class="line">[zk: localhost:2181(CONNECTED) 14] get /FirstZnode</div><div class="line">Node does not exist: /FirstZnode</div></pre></td></tr></table></figure></p>
 <p>还有一种删除，只能删除没有子节点的节点，语法：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">delete /path</div></pre></td></tr></table></figure></p>
 <p>示例：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">[zk: localhost:2181(CONNECTED) 17] create /myZnode &quot;mydata&quot;</div><div class="line">Created /myZnode</div><div class="line">[zk: localhost:2181(CONNECTED) 18] create /myZnode/child1 &quot;child1data&quot;</div><div class="line">Created /myZnode/child1</div><div class="line">[zk: localhost:2181(CONNECTED) 19] delete /myZnode</div><div class="line">Node not empty: /myZnode</div><div class="line">[zk: localhost:2181(CONNECTED) 20] delete /myZnode/child1</div><div class="line">[zk: localhost:2181(CONNECTED) 21] delete /myZnode</div><div class="line">[zk: localhost:2181(CONNECTED) 22] get /myZnode</div><div class="line">Node does not exist: /myZnode</div></pre></td></tr></table></figure></p>
-<h1 id="zookeeper的数据模型"><a href="#zookeeper的数据模型" class="headerlink" title="zookeeper的数据模型"></a>zookeeper的数据模型</h1><p>简单使用了zookeeper之后，我们发现其数据模型有些像操作系统的文件结构，结构如下图所示<br><img src="/2017/05/04/zookeeper入门/zookeeper数据模型.gif" alt="zookeeper数据模型"></p>
+<h1 id="zookeeper-数据模型"><a href="#zookeeper-数据模型" class="headerlink" title="zookeeper 数据模型"></a>zookeeper 数据模型</h1><p>简单使用了zookeeper之后，我们发现其数据模型有些像操作系统的文件结构，结构如下图所示<br><img src="/2017/05/04/zookeeper入门/zookeeper数据模型.gif" alt="zookeeper数据模型"></p>
 <ol>
 <li>每个节点在zookeeper中叫做znode，并且其有一个唯一的路径标识，如/Server1节点的标识就为/NameService/Server1。</li>
 <li>znode可以有子znode，并且znode里可以存数据，但是EPHEMERAL类型的节点不能有子节点。</li>
@@ -503,6 +1363,40 @@
 </ul>
 <p>示例：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div></pre></td><td class="code"><pre><div class="line">import java.io.IOException;</div><div class="line">import java.util.List;</div><div class="line"></div><div class="line">import org.apache.zookeeper.CreateMode;</div><div class="line">import org.apache.zookeeper.KeeperException;</div><div class="line">import org.apache.zookeeper.WatchedEvent;</div><div class="line">import org.apache.zookeeper.Watcher;</div><div class="line">import org.apache.zookeeper.ZooDefs;</div><div class="line">import org.apache.zookeeper.ZooKeeper;</div><div class="line">import org.apache.zookeeper.data.Stat;</div><div class="line"></div><div class="line">/**</div><div class="line"> * Test Zookeeper</div><div class="line"> *</div><div class="line"> * @author tenny.peng</div><div class="line"> */</div><div class="line">public class TestZookeeper &#123;</div><div class="line"></div><div class="line">	public static void main(String[] args) &#123;</div><div class="line">		try &#123;</div><div class="line">			// 创建一个Zookeeper实例。param1:目标服务器地址和端口；param2:Session超时时间；param3:节点变化时的回调方法。</div><div class="line">			ZooKeeper zk = new ZooKeeper(&quot;127.0.0.1:2181&quot;, 500000, new Watcher() &#123;</div><div class="line">				// 监控所有被触发的事件</div><div class="line">				public void process(WatchedEvent event) &#123;</div><div class="line">					// dosomething</div><div class="line">					System.out.println(&quot;监听事件： &quot; + event.toString());</div><div class="line">				&#125;</div><div class="line">			&#125;);</div><div class="line"></div><div class="line">			// 创建一个节点。param1:节点路径；param2:节点数据；param3:权限控制；这里表示所有人都可以操作；param4:节点类型，这里为永久。</div><div class="line">			zk.create(&quot;/FirstZnode&quot;, &quot;my first zookeeper app&quot;.getBytes(), ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);</div><div class="line"></div><div class="line">			// 查看一个节点是否存在。param1:znode路径；param2:是否监测(watch)查看的节点，重载方法：可传入自定义watch。</div><div class="line">			Stat stat = zk.exists(&quot;/FirstZnode&quot;, true);</div><div class="line">			System.out.println(&quot;version: &quot; + stat.getVersion());</div><div class="line"></div><div class="line">			// 获取一个节点的数据。param1:znode路径；param2:是否监测(watch)，重载方法：可传入自定义watch；param3:znode的元数据。</div><div class="line">			byte[] b = zk.getData(&quot;/FirstZnode&quot;, true, stat);</div><div class="line">			String data = new String(b);</div><div class="line">			System.out.println(data);</div><div class="line"></div><div class="line">			// 修改一个节点的数据。param1:znode路径；param2:节点数据；param3:znode当前的版本号，-1无视被修改的数据版本，直接改掉。每当数据更改时，ZooKeeper会更新znode的版本号。</div><div class="line">			zk.setData(&quot;/FirstZnode&quot;, &quot;my first zookeeper app1.1&quot;.getBytes(), stat.getVersion());</div><div class="line">			stat = zk.exists(&quot;/FirstZnode&quot;, true);</div><div class="line">			System.out.println(&quot;version: &quot; + stat.getVersion());</div><div class="line">			b = zk.getData(&quot;/FirstZnode&quot;, true, stat);</div><div class="line">			data = new String(b);</div><div class="line">			System.out.println(data);</div><div class="line"></div><div class="line">			// 创建子节点，和创建节点一样。</div><div class="line">			zk.create(&quot;/FirstZnode/child1&quot;, &quot;child1 data&quot;.getBytes(), ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);</div><div class="line">			zk.create(&quot;/FirstZnode/child2&quot;, &quot;child2 data&quot;.getBytes(), ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);</div><div class="line"></div><div class="line">			// 获取子节点。param1:znode路径；param2:是否监测(watch)，重载方法：可传入自定义watch。</div><div class="line">			List&lt;String&gt; children = zk.getChildren(&quot;/FirstZnode&quot;, true);</div><div class="line">			for (int i = 0; i &lt; children.size(); i++) &#123;</div><div class="line">				System.out.println(children.get(i));</div><div class="line">			&#125;</div><div class="line"></div><div class="line">			// 删除节点，如有子节点必须先删除子节点。param1:znode路径；param2:znode的当前版本，－1的话直接删除，无视版本。</div><div class="line">			zk.delete(&quot;/FirstZnode/child1&quot;, -1);</div><div class="line">			zk.delete(&quot;/FirstZnode/child2&quot;, -1);</div><div class="line">			zk.delete(&quot;/FirstZnode&quot;, -1);</div><div class="line"></div><div class="line">			// 关闭session</div><div class="line">			zk.close();</div><div class="line"></div><div class="line">		&#125; catch (IOException e) &#123;</div><div class="line">			e.printStackTrace();</div><div class="line">		&#125; catch (KeeperException e) &#123;</div><div class="line">			e.printStackTrace();</div><div class="line">		&#125; catch (InterruptedException e) &#123;</div><div class="line">			e.printStackTrace();</div><div class="line">		&#125;</div><div class="line"></div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
 <p>结果：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">监听事件： WatchedEvent state:SyncConnected type:None path:null</div><div class="line">version: 0</div><div class="line">my first zookeeper app</div><div class="line">监听事件： WatchedEvent state:SyncConnected type:NodeDataChanged path:/FirstZnode</div><div class="line">version: 1</div><div class="line">my first zookeeper app1.1</div><div class="line">child2</div><div class="line">child1</div><div class="line">监听事件： WatchedEvent state:SyncConnected type:NodeChildrenChanged path:/FirstZnode</div><div class="line">监听事件： WatchedEvent state:SyncConnected type:NodeDeleted path:/FirstZnode</div></pre></td></tr></table></figure></p>
+<h1 id="zookeeper-集群"><a href="#zookeeper-集群" class="headerlink" title="zookeeper 集群"></a>zookeeper 集群</h1><p>Zookeeper 不仅可以单机提供服务，同时也支持多机组成集群来提供服务。实际上 Zookeeper 还支持另外一种伪集群的方式，也就是可以在一台物理机上运行多个 Zookeeper 实例。</p>
+<p>下面介绍伪集群模式的安装和配置：</p>
+<ol>
+<li>新建一个总文件夹zookeeperCluster用于存放集群；</li>
+<li>zookeeperCluster文件夹下建立三个文件夹server1，server2，server3；</li>
+<li>每个server里面新建一个data文件夹和一个log文件夹，并复制一份单机的zookeeper的文件夹；</li>
+<li>每个server/data下新建一个myid文件并写入一个数字，server1就写1，server2写2，server3写3。Zookeeper 启动时会读取这个文件，拿到里面的数据与 zoo.cfg 里面的配置信息比较从而判断当前 server 到底是哪个 server。</li>
+<li><p>进入各个server/zookeeper/conf目录，编辑zoo.cfg。由于是在一台机器上部署多个server，每个server要用不同的clientPort，比如server1是2181，server2是2182，server3是2183，dataDir和dataLogDir也要修改成相应路径。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">tickTime=2000</div><div class="line">initLimit=10</div><div class="line">syncLimit=4</div><div class="line">dataDir=D:/devsoft/zookeeperCluster/server1/data</div><div class="line">dataLogDir=D:/devsoft/zookeeperCluster/server1/log</div><div class="line">clientPort=2181</div><div class="line">server.1=127.0.0.1:2888:3888</div><div class="line">server.2=127.0.0.1:2889:3889</div><div class="line">server.3=127.0.0.1:2890:3890</div></pre></td></tr></table></figure>
+</li>
+<li><p>分别启动三个server/zookeeper/bin/zkServer.cmd。</p>
+</li>
+</ol>
+<p>说明一下集群的几个配置参数</p>
+<ul>
+<li>initLimit：这个配置项是用来配置 Zookeeper 接受客户端（这里所说的客户端不是用户连接 Zookeeper 服务器的客户端，而是 Zookeeper 服务器集群中连接到 Leader 的 Follower 服务器）初始化连接时最长能忍受多少个心跳时间间隔数。当已经超过 10 个心跳的时间（也就是 tickTime）长度后 Zookeeper 服务器还没有收到客户端的返回信息，那么表明这个客户端连接失败。总的时间长度就是 10*2000=20 秒。</li>
+<li>syncLimit：这个配置项标识 Leader 与 Follower 之间发送消息，请求和应答时间长度，最长不能超过多少个 tickTime 的时间长度，总的时间长度就是 4*2000=8 秒。</li>
+<li>server.A=B:C:D：其中 A 是一个数字，表示这个是第几号服务器；B 是这个服务器的 ip 地址；C 表示的是这个服务器与集群中的 Leader 服务器交换信息的端口；D 表示的是万一集群中的 Leader 服务器挂了，需要一个端口来重新进行选举，选出一个新的 Leader，而这个端口就是用来执行选举时服务器相互通信的端口。如果是伪集群的配置方式，由于 B 都是一样，所以不同的 Zookeeper 实例通信端口号不能一样，所以要给它们分配不同的端口号。</li>
+</ul>
+<p>启动第一个server,这时会报大量错误。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">2017-05-06 17:26:12,366 [myid:1] - INFO  [QuorumPeer[myid=1]/0:0:0:0:0:0:0:0:218</div><div class="line">1:FastLeaderElection@852] - Notification time out: 800</div></pre></td></tr></table></figure></p>
+<p>没关系，因为现在集群只起了1台server，zookeeper服务器端起来会根据zoo.cfg的服务器列表发起选举leader的请求，因为连不上其他机器而报错。<br>我们再起第二个zookeeper服务，leader将会被选出，从而一致性服务开始可以使用，这是因为3台机器只要有2台可用就可以选出leader并且对外提供服务(2n+1台机器，可以容n台机器挂掉)。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">2017-05-06 17:26:39,573 [myid:2] - INFO  [WorkerSender[myid=2]:QuorumPeer$Quorum</div><div class="line">Server@149] - Resolved hostname: 127.0.0.1 to address: /127.0.0.1</div></pre></td></tr></table></figure></p>
+<p>再启动最后一个zookeeper服务。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">2017-05-06 17:27:11,071 [myid:3] - INFO  [QuorumPeer[myid=3]/0:0:0:0:0:0:0:0:218</div><div class="line">3:FileTxnSnapLog@240] - Snapshotting: 0x700000000 to D:\devsoft\zookeeperCluster</div><div class="line">\server3\data\version-2\snapshot.700000000</div></pre></td></tr></table></figure></p>
+<p>开启一个客户端zkCli.cmd，可以看到成功连接集群中的master。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">2017-05-06 17:27:11,071 [myid:3] - INFO  [QuorumPeer[myid=3]/0:0:0:0:0:0:0:0:218</div><div class="line">3:FileTxnSnapLog@240] - Snapshotting: 0x700000000 to D:\devsoft\zookeeperCluster</div><div class="line">\server3\data\version-2\snapshot.700000000</div></pre></td></tr></table></figure></p>
+<p>然后客户端就可以像之前单机一样进行各种操作。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">ls /</div><div class="line">[zookeeper]</div><div class="line">[zk: localhost:2181(CONNECTED) 1] create /testZnode &quot;testdata&quot;</div><div class="line">Created /testZnode</div><div class="line">[zk: localhost:2181(CONNECTED) 2] ls /</div><div class="line">[zookeeper, testZnode]</div><div class="line">[zk: localhost:2181(CONNECTED) 3] delete /testZnode</div><div class="line">[zk: localhost:2181(CONNECTED) 4] ls /</div><div class="line">[zookeeper]</div></pre></td></tr></table></figure></p>
+<h1 id="ZooKeeper-典型的应用场景"><a href="#ZooKeeper-典型的应用场景" class="headerlink" title="ZooKeeper 典型的应用场景"></a>ZooKeeper 典型的应用场景</h1><p>Zookeeper 从设计模式角度来看，是一个基于观察者模式设计的分布式服务管理框架，它负责存储和管理大家都关心的数据，然后接受观察者的注册，一旦这些数据的状态发生变化，Zookeeper 就将负责通知已经在 Zookeeper 上注册的那些观察者做出相应的反应，从而实现集群中类似 Master/Slave 管理模式。</p>
+<p>下面详细介绍这些典型的应用场景。</p>
+<h3 id="配置管理（Configuration-Management）"><a href="#配置管理（Configuration-Management）" class="headerlink" title="配置管理（Configuration Management）"></a>配置管理（Configuration Management）</h3><p>配置的管理在分布式应用环境中很常见，例如同一个应用系统需要多台 PC Server 运行，但是它们运行的应用系统的某些配置项是相同的，如果要修改这些相同的配置项，那么就必须同时修改每台运行这个应用系统的 PC Server，这样非常麻烦而且容易出错。</p>
+<p>像这样的配置信息完全可以交给 Zookeeper 来管理，将配置信息保存在 Zookeeper 的某个目录节点中，然后将所有需要修改的应用机器监控配置信息的状态，一旦配置信息发生变化，每台应用机器就会收到 Zookeeper 的通知，然后从 Zookeeper 获取新的配置信息应用到系统中。</p>
+<p>比如将APP1的所有配置配置到/APP1 znode下，APP1所有机器一启动就对/APP1这个节点进行监控，并且实现回调方法Watcher，那么在zookeeper上/APP1 znode节点下数据发生变化的时候，每个机器都会收到通知，Watcher方法将会被执行，那么应用再取下数据即可。<br><img src="/2017/05/04/zookeeper入门/配置管理结构图.gif" alt="配置管理结构图"></p>
+<h3 id="集群管理（Group-Membership）"><a href="#集群管理（Group-Membership）" class="headerlink" title="集群管理（Group Membership）"></a>集群管理（Group Membership）</h3><p>Zookeeper 能够很容易的实现集群管理的功能，如有多台 Server 组成一个服务集群，那么必须要一个“总管”知道当前集群中每台机器的服务状态，一旦有机器不能提供服务，集群中其它集群必须知道，从而做出调整重新分配服务策略。同样当增加集群的服务能力时，就会增加一台或多台 Server，同样也必须让“总管”知道。</p>
+<p>Zookeeper 不仅能够帮你维护当前的集群中机器的服务状态，而且能够帮你选出一个“总管”，让这个总管来管理集群，这就是 Zookeeper 的另一个功能 Leader Election。</p>
+<p>它们的实现方式都是在 Zookeeper 上创建一个 EPHEMERAL 类型的目录节点，然后每个 Server 在它们创建目录节点的父目录节点上调用 getChildren(String path, boolean watch) 方法并设置 watch 为 true，由于是 EPHEMERAL 目录节点，当创建它的 Server 死去，这个目录节点也随之被删除，所以 Children 将会变化，这时 getChildren上的 Watch 将会被调用，所以其它 Server 就知道已经有某台 Server 死去了。新增 Server 也是同样的原理。</p>
+<p>Zookeeper 如何实现 Leader Election，也就是选出一个 Master Server。和前面的一样每台 Server 创建一个 EPHEMERAL 目录节点，不同的是它还是一个 SEQUENTIAL 目录节点，所以它是个 EPHEMERAL_SEQUENTIAL 目录节点。之所以它是 EPHEMERAL_SEQUENTIAL 目录节点，是因为我们可以给每台 Server 编号，我们可以选择当前是最小编号的 Server 为 Master，假如这个最小编号的 Server 死去，由于是 EPHEMERAL 节点，死去的 Server 对应的节点也被删除，所以当前的节点列表中又出现一个最小编号的节点，我们就选择这个节点为当前 Master。这样就实现了动态选择 Master，避免了传统意义上单 Master 容易出现单点故障的问题。<br><img src="/2017/05/04/zookeeper入门/集群管理结构图.gif" alt="集群管理结构图"></p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>通过命令行和API使用了zookeeper的基本功能。Zoopkeeper 提供了一套很好的分布式集群管理的机制，即基于层次型的目录树的数据结构，并对树中的节点进行有效管理，从而可以设计出多种多样的分布式的数据管理模型。</p>
 <p>参考链接：<a href="http://www.w3cschool.cn/zookeeper/" target="_blank" rel="external">http://www.w3cschool.cn/zookeeper/</a><br>　　　　　<a href="http://www.blogjava.net/BucketLi/archive/2010/12/21/341268.html" target="_blank" rel="external">http://www.blogjava.net/BucketLi/archive/2010/12/21/341268.html</a><br>　　　　　<a href="https://www.ibm.com/developerworks/cn/opensource/os-cn-zookeeper/" target="_blank" rel="external">https://www.ibm.com/developerworks/cn/opensource/os-cn-zookeeper/</a></p>
 
           
@@ -1354,7 +2248,7 @@
           
             <p>Hexo是一款基于Node.js的静态博客框架，配合github可以搭建属于自己的博客。</p>
 <h1 id="搭建环境"><a href="#搭建环境" class="headerlink" title="搭建环境"></a>搭建环境</h1><h2 id="安装Node-js"><a href="#安装Node-js" class="headerlink" title="安装Node.js"></a>安装Node.js</h2><p>Hexo需要node.js支持，可以到<a href="http://nodejs.cn/download/" target="_blank" rel="external">node.js中文网</a>下载适合自己系统的安装包。安装也比较简单，一路next下去就可以了。</p>
-<p>安装完后win + r 输入cmd回车，打开命令行界面，分别输入node -v 和nmp -v，看到类似如下结果就说明安装成功了。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">&gt;node -v</div><div class="line">v6.10.1</div><div class="line">&gt;nmp -v</div><div class="line">3.10.10</div></pre></td></tr></table></figure></p>
+<p>安装完后win + r 输入cmd回车，打开命令行界面，分别输入node -v 和npm -v，看到类似如下结果就说明安装成功了。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">&gt;node -v</div><div class="line">v6.10.1</div><div class="line">&gt;npm -v</div><div class="line">3.10.10</div></pre></td></tr></table></figure></p>
 <h2 id="安装Hexo"><a href="#安装Hexo" class="headerlink" title="安装Hexo"></a>安装Hexo</h2><p>在合适的地方建立一个文件夹，用于安装hexo框架和存放你的博客。我的文件夹是D:\devsoft\hexo。</p>
 <p>命令行切换到hexo目录<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">C:\Users\tenny&gt;d:</div><div class="line"></div><div class="line">D:\&gt;cd devsoft</div><div class="line"></div><div class="line">D:\devsoft&gt;cd hexo</div><div class="line"></div><div class="line">D:\devsoft\hexo&gt;</div></pre></td></tr></table></figure></p>
 <p>输入如下命令安装hexo到当前目录<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">npm install hexo-cli -g</div></pre></td></tr></table></figure></p>
@@ -1436,754 +2330,11 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="https://tenny-peng.github.io/2017/04/21/spring整合redis/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Tenny Peng">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Tenny's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2017/04/21/spring整合redis/" itemprop="url">
-                  spring整合redis
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-04-21T10:02:06+08:00">
-                2017-04-21
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/redis/" itemprop="url" rel="index">
-                    <span itemprop="name">redis</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="概念简介："><a href="#概念简介：" class="headerlink" title="概念简介："></a>概念简介：</h1><ul>
-<li>Redis：一款开源的Key-Value数据库。</li>
-<li>Jedis：Redis官方推出的一款面向Java的客户端，提供了很多接口供Java语言调用。</li>
-<li>Spring Data Redis：SDR是Spring官方推出，可以算是Spring框架集成Redis操作的一个子框架，封装了Redis的很多命令，可以很方便的使用Spring操作Redis数据库。</li>
-</ul>
-<p>这三个究竟有什么区别呢？可以简单的这么理解，Redis是用ANSI C写的一个基于内存的Key-Value数据库，而Jedis是Redis官方推出的面向Java的Client，提供了很多接口和方法，可以让Java操作使用Redis，而Spring Data Redis是对Jedis进行了封装，集成了Jedis的一些命令和方法，可以与Spring整合。在后面的配置文件（spring-redis.xml）中可以看到，Spring是通过Jedis类来初始化connectionFactory的。</p>
-<h1 id="spring整合redis"><a href="#spring整合redis" class="headerlink" title="spring整合redis"></a>spring整合redis</h1><ol>
-<li><p>maven添加依赖配置</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">&lt;dependency&gt;</div><div class="line">  &lt;groupId&gt;org.springframework.data&lt;/groupId&gt;</div><div class="line">  &lt;artifactId&gt;spring-data-redis&lt;/artifactId&gt;</div><div class="line">	&lt;version&gt;1.4.1.RELEASE&lt;/version&gt;</div><div class="line">&lt;/dependency&gt;</div><div class="line"></div><div class="line">&lt;dependency&gt;</div><div class="line">	&lt;groupId&gt;redis.clients&lt;/groupId&gt;</div><div class="line">	&lt;artifactId&gt;jedis&lt;/artifactId&gt;</div><div class="line">	&lt;version&gt;2.6.1&lt;/version&gt;</div><div class="line">&lt;/dependency&gt;</div></pre></td></tr></table></figure>
-</li>
-<li><p>redis.properties</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"># Redis settings</div><div class="line">redis.host=localhost</div><div class="line">redis.port=6379</div><div class="line">redis.pass=tenny</div><div class="line">redis.maxTotal=200</div><div class="line">redis.maxIdle=50</div><div class="line">redis.minIdle=300</div><div class="line">redis.maxWaitMillis=1000</div><div class="line">redis.testOnBorrow=true</div></pre></td></tr></table></figure>
-</li>
-<li><p>spring-redis.xml</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div></pre></td><td class="code"><pre><div class="line">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;  </div><div class="line">&lt;beans xmlns=&quot;http://www.springframework.org/schema/beans&quot;</div><div class="line">	xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</div><div class="line">	xmlns:context=&quot;http://www.springframework.org/schema/context&quot;</div><div class="line">	xmlns:mvc=&quot;http://www.springframework.org/schema/mvc&quot;</div><div class="line">	xmlns:p=&quot;http://www.springframework.org/schema/p&quot;</div><div class="line">	xmlns:c=&quot;http://www.springframework.org/schema/c&quot;</div><div class="line">	xsi:schemaLocation=&quot;http://www.springframework.org/schema/beans  </div><div class="line">                        http://www.springframework.org/schema/beans/spring-beans.xsd  </div><div class="line">                        http://www.springframework.org/schema/context  </div><div class="line">                        http://www.springframework.org/schema/context/spring-context.xsd  </div><div class="line">                        http://www.springframework.org/schema/mvc  </div><div class="line">                        http://www.springframework.org/schema/mvc/spring-mvc.xsd&quot;&gt;</div><div class="line"></div><div class="line">    &lt;context:property-placeholder location=&quot;classpath:redis.properties&quot; /&gt;  </div><div class="line"></div><div class="line">    &lt;bean id=&quot;poolConfig&quot; class=&quot;redis.clients.jedis.JedisPoolConfig&quot;&gt;  </div><div class="line">        &lt;property name=&quot;maxTotal&quot; value=&quot;$&#123;redis.maxTotal&#125;&quot; /&gt;</div><div class="line">        &lt;property name=&quot;maxIdle&quot; value=&quot;$&#123;redis.maxIdle&#125;&quot; /&gt;</div><div class="line">        &lt;property name=&quot;minIdle&quot; value=&quot;$&#123;redis.minIdle&#125;&quot; /&gt;</div><div class="line">        &lt;property name=&quot;maxWaitMillis&quot; value=&quot;$&#123;redis.maxWaitMillis&#125;&quot; /&gt;</div><div class="line">        &lt;property name=&quot;testOnBorrow&quot; value=&quot;$&#123;redis.testOnBorrow&#125;&quot; /&gt;</div><div class="line">    &lt;/bean&gt;</div><div class="line"></div><div class="line">    &lt;bean id=&quot;connectionFactory&quot; class=&quot;org.springframework.data.redis.connection.jedis.JedisConnectionFactory&quot;</div><div class="line">		p:hostName=&quot;$&#123;redis.host&#125;&quot; p:port=&quot;$&#123;redis.port&#125;&quot; p:password=&quot;$&#123;redis.pass&#125;&quot; c:poolConfig-ref=&quot;poolConfig&quot;&gt;</div><div class="line">    &lt;/bean&gt;  </div><div class="line"></div><div class="line">    &lt;bean id=&quot;redisTemplate&quot; class=&quot;org.springframework.data.redis.core.RedisTemplate&quot;&gt;  </div><div class="line">        &lt;property name=&quot;connectionFactory&quot; ref=&quot;connectionFactory&quot; /&gt;</div><div class="line">    &lt;/bean&gt;</div><div class="line"></div><div class="line">    &lt;bean id=&quot;cacheManager&quot; class=&quot;org.springframework.data.redis.cache.RedisCacheManager&quot; c:template-ref=&quot;redisTemplate&quot;&gt;</div><div class="line">        &lt;property name=&quot;usePrefix&quot; value=&quot;true&quot; /&gt;</div><div class="line">        &lt;property name=&quot;cacheNames&quot;&gt;</div><div class="line">            &lt;set&gt;</div><div class="line">                &lt;value&gt;t&lt;/value&gt;</div><div class="line">                &lt;value&gt;c&lt;/value&gt;</div><div class="line">            &lt;/set&gt;</div><div class="line">        &lt;/property&gt;</div><div class="line">    &lt;/bean&gt;</div><div class="line"></div><div class="line">&lt;/beans&gt;</div></pre></td></tr></table></figure>
-</li>
-<li><p>定义User实体</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div></pre></td><td class="code"><pre><div class="line">import java.io.Serializable;</div><div class="line">import java.util.Date;</div><div class="line"></div><div class="line">public class User implements Serializable &#123;</div><div class="line"></div><div class="line">	private static final long serialVersionUID = -6683628971480535063L;</div><div class="line"></div><div class="line">	private Integer id;</div><div class="line"></div><div class="line">	private String username;</div><div class="line"></div><div class="line">	private String password;</div><div class="line"></div><div class="line">	private Integer type;</div><div class="line"></div><div class="line">	private Date createTime;</div><div class="line"></div><div class="line">	public Integer getId() &#123;</div><div class="line">		return id;</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	public void setId(Integer id) &#123;</div><div class="line">		this.id = id;</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	public String getUsername() &#123;</div><div class="line">		return username;</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	public void setUsername(String username) &#123;</div><div class="line">		this.username = username == null ? null : username.trim();</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	public String getPassword() &#123;</div><div class="line">		return password;</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	public void setPassword(String password) &#123;</div><div class="line">		this.password = password == null ? null : password.trim();</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	public Integer getType() &#123;</div><div class="line">		return type;</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	public void setType(Integer type) &#123;</div><div class="line">		this.type = type;</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	public Date getCreateTime() &#123;</div><div class="line">		return createTime;</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	public void setCreateTime(Date createTime) &#123;</div><div class="line">		this.createTime = createTime;</div><div class="line">	&#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
-</li>
-<li><p>测试</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div></pre></td><td class="code"><pre><div class="line">import java.util.Date;</div><div class="line">import org.springframework.cache.Cache;</div><div class="line">import org.springframework.cache.Cache.ValueWrapper;</div><div class="line">import org.springframework.context.support.ClassPathXmlApplicationContext;</div><div class="line">import org.springframework.data.redis.cache.RedisCacheManager;</div><div class="line">import com.news.pojo.User;</div><div class="line"></div><div class="line">public class TestRedis &#123;</div><div class="line"></div><div class="line">	@SuppressWarnings(&quot;resource&quot;)</div><div class="line">	public static void main(String[] args) &#123;</div><div class="line">		ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext(&quot;spring-redis.xml&quot;);</div><div class="line">		RedisCacheManager cacheManager = (RedisCacheManager) context.getBean(&quot;cacheManager&quot;);</div><div class="line">		System.out.println(&quot;cacheNames: &quot; + cacheManager.getCacheNames());</div><div class="line">		Cache cacheT = cacheManager.getCache(&quot;t&quot;);</div><div class="line">		Cache cacheC = cacheManager.getCache(&quot;c&quot;);</div><div class="line"></div><div class="line">		User user1 = new User();</div><div class="line">		user1.setId(1);</div><div class="line">		user1.setUsername(&quot;tenny&quot;);</div><div class="line">		user1.setPassword(&quot;admin&quot;);</div><div class="line">		user1.setType(1);</div><div class="line">		user1.setCreateTime(new Date());</div><div class="line">		User user2 = new User();</div><div class="line">		user2.setId(2);</div><div class="line">		user2.setUsername(&quot;panda&quot;);</div><div class="line">		user2.setPassword(&quot;xiaobai&quot;);</div><div class="line">		user2.setType(2);</div><div class="line">		user2.setCreateTime(new Date());</div><div class="line"></div><div class="line">		System.out.println(&quot;put two user into cacheT...&quot;);</div><div class="line">		cacheT.put(&quot;user1&quot;, user1);</div><div class="line">		cacheT.put(&quot;user2&quot;, user2);</div><div class="line">		System.out.println(&quot;put name and age into cacheC...&quot;);</div><div class="line">		cacheC.put(&quot;name&quot;, &quot;tenny&quot;);</div><div class="line">		cacheC.put(&quot;age&quot;, 25);</div><div class="line"></div><div class="line">		System.out.println(&quot;get two user from cacheT&quot;);</div><div class="line">		User value1 = cacheT.get(&quot;user1&quot;, User.class);</div><div class="line">		System.out.println(value1.toString());</div><div class="line">		ValueWrapper value2 = cacheT.get(&quot;user2&quot;);</div><div class="line">		System.out.println(value2.get());</div><div class="line"></div><div class="line">		System.out.println(&quot;get two user from cacheC&quot;);</div><div class="line">		ValueWrapper value3 = cacheC.get(&quot;name&quot;);</div><div class="line">		System.out.println(value3.get());</div><div class="line">		ValueWrapper value4 = cacheC.get(&quot;age&quot;);</div><div class="line">		System.out.println(value4.get());</div><div class="line"></div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-</li>
-<li><p>测试结果</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">cacheNames: [t, c]</div><div class="line">put two user into cacheT...</div><div class="line">put name and age into cacheC...</div><div class="line">get two user from cacheT</div><div class="line">com.news.pojo.User@2ea227af</div><div class="line">com.news.pojo.User@4386f16</div><div class="line">get two field from cacheC</div><div class="line">tenny</div><div class="line">25</div></pre></td></tr></table></figure>
-</li>
-<li><p>直接使用redisTemplate</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">@SuppressWarnings(&quot;unchecked&quot;)</div><div class="line">RedisTemplate&lt;String, User&gt; redisTemplate = (RedisTemplate&lt;String, User&gt;) context.getBean(&quot;redisTemplate&quot;);</div><div class="line">System.out.println(&quot;put two user into redisTemplate...&quot;);</div><div class="line">redisTemplate.opsForHash().put(&quot;user&quot;, &quot;user1&quot;, user1);</div><div class="line">redisTemplate.opsForHash().put(&quot;user&quot;, &quot;user2&quot;, user2);</div><div class="line">System.out.println(&quot;gut two user from redisTemplate...&quot;);</div><div class="line">User redisUser1 = (User) redisTemplate.opsForHash().get(&quot;user&quot;, &quot;user1&quot;);</div><div class="line">System.out.println(redisUser1);</div><div class="line">User redisUser2 = (User) redisTemplate.opsForHash().get(&quot;user&quot;, &quot;user2&quot;);</div><div class="line">System.out.println(redisUser2);</div><div class="line"></div><div class="line">@SuppressWarnings(&quot;unchecked&quot;)</div><div class="line">RedisTemplate&lt;String, String&gt; redisTemplate2 = (RedisTemplate&lt;String, String&gt;) context.getBean(&quot;redisTemplate&quot;);</div><div class="line">System.out.println(&quot;put color list into redisTemplate2...&quot;);</div><div class="line">redisTemplate2.opsForList().leftPush(&quot;color&quot;, &quot;blue&quot;);</div><div class="line">redisTemplate2.opsForList().leftPush(&quot;color&quot;, &quot;red&quot;);</div><div class="line">redisTemplate2.opsForList().rightPush(&quot;color&quot;, &quot;yellow&quot;);</div><div class="line">System.out.println(&quot;gut color list from redisTemplate2...&quot;);</div><div class="line">List&lt;String&gt; colorList = redisTemplate2.opsForList().range(&quot;color&quot;, 0, -1);</div><div class="line">System.out.println(colorList);</div></pre></td></tr></table></figure>
-</li>
-<li><p>redisTemplate测试结果</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">put two user into redisTemplate...</div><div class="line">gut two user from redisTemplate...</div><div class="line">com.news.pojo.User@4313f5bc</div><div class="line">com.news.pojo.User@7f010382</div><div class="line">put color list into redisTemplate2...</div><div class="line">gut color list from redisTemplate2...</div><div class="line">[red, blue, yellow]</div></pre></td></tr></table></figure>
-</li>
-</ol>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="https://tenny-peng.github.io/2017/04/19/redis设置密码/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Tenny Peng">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Tenny's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2017/04/19/redis设置密码/" itemprop="url">
-                  redis设置密码
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-04-19T16:48:43+08:00">
-                2017-04-19
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/redis/" itemprop="url" rel="index">
-                    <span itemprop="name">redis</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>设置密码有两种方式。</p>
-<ol>
-<li><p>命令行设置密码。</p>
-<p>运行cmd切换到redis根目录，先启动服务端</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&gt;redis-server.exe</div></pre></td></tr></table></figure>
-<p>另开一个cmd切换到redis根目录，启动客户端</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&gt;redis-cli.exe -h 127.0.0.1 -p 6379</div></pre></td></tr></table></figure>
-<p>客户端使用config get requirepass命令查看密码</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">&gt;config get requirepass</div><div class="line">1)&quot;requirepass&quot;</div><div class="line">2)&quot;&quot;    //默认空</div></pre></td></tr></table></figure>
-<p>客户端使用config set requirepass yourpassword命令设置密码</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">&gt;config set requirepass 123456</div><div class="line">&gt;OK</div></pre></td></tr></table></figure>
-<p>一旦设置密码，必须先验证通过密码，否则所有操作不可用</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">&gt;config get requirepass</div><div class="line">(error)NOAUTH Authentication required</div></pre></td></tr></table></figure>
-<p>使用auth password验证密码</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">&gt;auth 123456</div><div class="line">&gt;OK</div><div class="line">&gt;config get requirepass</div><div class="line">1)&quot;requirepass&quot;</div><div class="line">2)&quot;123456&quot;</div></pre></td></tr></table></figure>
-<p>也可以退出重新登录</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">redis-cli.exe -h 127.0.0.1 -p 6379 -a 123456</div></pre></td></tr></table></figure>
-<p>命令行设置的密码在服务重启后失效，所以一般不使用这种方式。</p>
-</li>
-<li><p>配置文件设置密码</p>
-<p>在redis根目录下找到redis.windows.conf配置文件，搜索requirepass，找到注释密码行，添加密码如下：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"># requirepass foobared</div><div class="line">requirepass tenny     //注意，行前不能有空格</div></pre></td></tr></table></figure>
-<p>重启服务后，客户端重新登录后发现</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">&gt;config get requirepass</div><div class="line">1)&quot;requirepass&quot;</div><div class="line">2)&quot;&quot;</div></pre></td></tr></table></figure>
-<p>密码还是空？</p>
-<p>网上查询后的办法：创建redis-server.exe 的快捷方式， 右键快捷方式属性，在目标后面增加redis.windows.conf， 这里就是关键，你虽然修改了.conf文件，但是exe却没有使用这个conf，所以我们需要<strong>手动指定</strong>一下exe按照<strong>修改后的conf</strong>运行，就OK了。</p>
-<p>所以，这里我再一次重启redis服务(指定配置文件)</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&gt;redis-server.exe redis.windows.conf</div></pre></td></tr></table></figure>
-<p>客户端再重新登录，OK了。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">&gt;redis-cli.exe -h 127.0.0.1 -p 6379 -a 123456</div><div class="line">&gt;config get requirepass</div><div class="line">1)&quot;requirepass&quot;</div><div class="line">2)&quot;123456&quot;</div></pre></td></tr></table></figure>
-<p>疑问: redis目录下有两个配置文件redis.windows.conf和redis.windows-server.conf，看到网上有的人用前者有的人用后者，不清楚到底该用哪一个。看了下两个文件又没啥区别，个人就用前者了。</p>
-</li>
-</ol>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="https://tenny-peng.github.io/2017/04/15/redis入门/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Tenny Peng">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Tenny's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2017/04/15/redis入门/" itemprop="url">
-                  redis入门
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-04-15T08:54:10+08:00">
-                2017-04-15
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/redis/" itemprop="url" rel="index">
-                    <span itemprop="name">redis</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="redis简介"><a href="#redis简介" class="headerlink" title="redis简介"></a>redis简介</h1><p>Redis 是一个高性能的key-value数据库。</p>
-<ul>
-<li>Redis可基于内存亦可持久化。</li>
-<li>Redis 支持存储的value类型丰富，包括string(字符串)、list(链表)、set(集合)、zset(sorted set –有序集合)和hash（哈希类型）</li>
-<li>Redis性能极高，读的速度可高达110000次/s，写的速度可高达81000次/s 。</li>
-<li>Redis的所有操作都是原子性的，Redis还支持几个操作合并后的原子性执行。</li>
-</ul>
-<h1 id="Redis-下载安装"><a href="#Redis-下载安装" class="headerlink" title="Redis 下载安装"></a>Redis 下载安装</h1><p>Redis官方并不支持Windows。 但是，微软针对Win64自己开发了一个windows版的redis并共享到github上。</p>
-<p>点击<a href="https://github.com/MSOpenTech/redis/releases" target="_blank" rel="external">https://github.com/MSOpenTech/redis/releases</a>下载。</p>
-<p>选择你喜欢的安装方式，这里我选择压缩版。<br><img src="/2017/04/15/redis入门/20170415092253.png" alt="下载redis"></p>
-<p>安装/解压缩后到redis目录找到redis-server.exe和redis-cli.exe<br><img src="/2017/04/15/redis入门/20170415094655.png" alt="redis目录"></p>
-<p>双击redis-server.exe启动redis服务<br><img src="/2017/04/15/redis入门/20170415095002.png" alt="redis服务"></p>
-<p>双击redis-cli.exe启动客户端，用来访问redis服务。<br><img src="/2017/04/15/redis入门/20170415095226.png" alt="redis客户端"></p>
-<p>测试一下，设置x的值为1并获取x。<br><img src="/2017/04/15/redis入门/20170415095445.png" alt="redis测试"></p>
-<h1 id="使用redis"><a href="#使用redis" class="headerlink" title="使用redis"></a>使用redis</h1><p>redis使用key-value来存储数据。</p>
-<h2 id="set-amp-get"><a href="#set-amp-get" class="headerlink" title="set &amp; get"></a>set &amp; get</h2><p>使用set命令设置值，并用get命令获取值。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">&gt; set name &quot;tenny&quot;</div><div class="line">OK</div><div class="line">&gt; get name</div><div class="line">&quot;tenny&quot;</div></pre></td></tr></table></figure></p>
-<h2 id="del"><a href="#del" class="headerlink" title="del"></a>del</h2><p>del删除一个key<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">&gt; del name</div><div class="line">(integer) 1</div><div class="line">&gt; get name</div><div class="line">(nil)</div></pre></td></tr></table></figure></p>
-<h2 id="incr"><a href="#incr" class="headerlink" title="incr"></a>incr</h2><p>incr递增一个值，如果key不存在则创造它并初始化值为1<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">&gt; set connections 10</div><div class="line">OK</div><div class="line">&gt; incr connections</div><div class="line">(integer) 11</div><div class="line">&gt; incr connections</div><div class="line">(integer) 12</div><div class="line"></div><div class="line">&gt; del connections</div><div class="line">(integer) 1</div><div class="line">&gt; incr connections    //connections不存在，初始化为1</div><div class="line">(integer) 1</div></pre></td></tr></table></figure></p>
-<h2 id="setnx"><a href="#setnx" class="headerlink" title="setnx"></a>setnx</h2><p>setnx(set-if-not-exists)，如果key不存在才改变值。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">&gt; set name &quot;panda&quot;</div><div class="line">OK</div><div class="line">&gt; get name</div><div class="line">&quot;panda&quot;</div><div class="line">&gt; setnx name &quot;tenny&quot;    //因为name存在所以不会改变值</div><div class="line">(integer) 0</div><div class="line">&gt; get name</div><div class="line">&quot;panda&quot;</div><div class="line"></div><div class="line">&gt; get age</div><div class="line">(nil)</div><div class="line">&gt; setnx age 22    //age不存在，赋值为22</div><div class="line">(integer) 1</div><div class="line">&gt; get age</div><div class="line">&quot;22&quot;</div></pre></td></tr></table></figure></p>
-<h2 id="expire-amp-ttl"><a href="#expire-amp-ttl" class="headerlink" title="expire &amp; ttl"></a>expire &amp; ttl</h2><p>expire设置生存时间，ttl查看剩余时间。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line">&gt; set name &quot;tenny&quot;</div><div class="line">OK</div><div class="line">&gt; expire name 120   //设置name生存时间为120秒</div><div class="line">(integer) 1</div><div class="line">&gt; ttl name</div><div class="line">(integer) 80    //剩余80秒</div><div class="line">&gt; ttl name      //2分钟后</div><div class="line">(integer) -2    //-2表示name这个key已经不存在了。</div><div class="line">&gt; get name</div><div class="line">(nil)</div><div class="line"></div><div class="line">&gt; set name &quot;tenny&quot;</div><div class="line">OK</div><div class="line">&gt; ttl name</div><div class="line">(integer) -1    //默认-1表示永久存在</div><div class="line">&gt; expire name 120</div><div class="line">(integer) 1</div><div class="line">&gt; ttl name</div><div class="line">(integer) 118</div><div class="line">&gt; get name</div><div class="line">&quot;tenny&quot;</div><div class="line">&gt; set name &quot;panda&quot;    //设置值会重置存在时间</div><div class="line">OK</div><div class="line">&gt; ttl name</div><div class="line">(integer) -1</div></pre></td></tr></table></figure></p>
-<h2 id="list操作：rpush-amp-lpush-amp-llen-amp-lrange-amp-lpop-amp-rpop"><a href="#list操作：rpush-amp-lpush-amp-llen-amp-lrange-amp-lpop-amp-rpop" class="headerlink" title="list操作：rpush &amp; lpush &amp; llen &amp; lrange &amp; lpop &amp; rpop"></a>list操作：rpush &amp; lpush &amp; llen &amp; lrange &amp; lpop &amp; rpop</h2><ul>
-<li><p>rpush在list末尾添加元素</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">&gt; rpush color &quot;blue&quot;    //[bule]</div><div class="line">(integer) 1</div><div class="line">&gt; rpush color &quot;red&quot;   //[bule, red]</div><div class="line">(integer) 2</div></pre></td></tr></table></figure>
-</li>
-<li><p>lpush在list开头添加元素</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">&gt; lpush color &quot;yellow&quot;    //[yellow, bule, red]</div><div class="line">(integer) 3</div></pre></td></tr></table></figure>
-</li>
-<li><p>llen查看list长度</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">&gt; llen color</div><div class="line">(integer) 3</div></pre></td></tr></table></figure>
-</li>
-<li><p>lrange查看list内容，接受两个参数，开始index和结尾index，如果结尾index为-1，表示直到list末尾。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">&gt; lrange color 0 2</div><div class="line">1) &quot;yellow&quot;</div><div class="line">2) &quot;blue&quot;</div><div class="line">3) &quot;red&quot;</div><div class="line">&gt; lrange color 0 1</div><div class="line">1) &quot;yellow&quot;</div><div class="line">2) &quot;blue&quot;</div><div class="line">&gt; lrange color 1 2</div><div class="line">1) &quot;blue&quot;</div><div class="line">2) &quot;red&quot;</div><div class="line">&gt; lrange color 1 2</div><div class="line">1) &quot;blue&quot;</div><div class="line">2) &quot;red&quot;</div></pre></td></tr></table></figure>
-</li>
-<li><p>lpop移除list第一个元素并返回它</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">&gt; lpop color</div><div class="line">&quot;yellow&quot;</div><div class="line">&gt; llen color</div><div class="line">(integer) 2</div><div class="line">&gt; lrange color 0 -1</div><div class="line">1) &quot;blue&quot;</div><div class="line">2) &quot;red&quot;</div></pre></td></tr></table></figure>
-</li>
-<li><p>rpop移除list最后一个元素并返回它</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">&gt; rpop color</div><div class="line">&quot;red&quot;</div><div class="line">&gt; llen color</div><div class="line">(integer) 1</div><div class="line">&gt; lrange color 0 -1</div><div class="line">1) &quot;blue&quot;</div></pre></td></tr></table></figure>
-</li>
-</ul>
-<h2 id="set操作：sadd-amp-srem-amp-sismember-amp-smembers-amp-sunion"><a href="#set操作：sadd-amp-srem-amp-sismember-amp-smembers-amp-sunion" class="headerlink" title="set操作：sadd &amp; srem &amp; sismember &amp; smembers &amp; sunion"></a>set操作：sadd &amp; srem &amp; sismember &amp; smembers &amp; sunion</h2><p>set类似list，但是元素没有顺序且只能出现一次。</p>
-<ul>
-<li><p>sadd添加一个元素到set</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">&gt; sadd superpowers &quot;flight&quot;   //[&quot;flight&quot;]</div><div class="line">(integer) 1</div><div class="line">&gt; sadd superpowers &quot;x-ray vision&quot;   //[&quot;flight&quot;, &quot;x-ray vision&quot;]</div><div class="line">(integer) 1</div><div class="line">&gt; sadd superpowers &quot;reflexes&quot;   //[&quot;flight&quot;, &quot;x-ray vision&quot;, &quot;reflexes&quot;]</div><div class="line">(integer) 1</div><div class="line">&gt; SADD superpowers &quot;flight&quot;   //重复添加无效</div><div class="line">(integer) 0</div></pre></td></tr></table></figure>
-</li>
-<li><p>srem从set中移除一个元素</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">&gt; srem superpowers &quot;reflexes&quot;   //[&quot;flight&quot;, &quot;x-ray vision&quot;]</div><div class="line">1</div></pre></td></tr></table></figure>
-</li>
-<li><p>sismember测试一个元素是否存在于set，存在返回1，不存在返回0</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">&gt; sismember superpowers &quot;flight&quot;</div><div class="line">(integer) 1</div><div class="line">&gt; sismember superpowers &quot;reflexes&quot;</div><div class="line">(integer) 0</div></pre></td></tr></table></figure>
-</li>
-<li><p>smembers查看set所有元素</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">&gt; sismember superpowers</div><div class="line">1) &quot;x-ray vision&quot;</div><div class="line">2) &quot;flight&quot;</div></pre></td></tr></table></figure>
-</li>
-<li><p>sunion联合多个set并返回它们的合集</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">&gt; sadd birdpowers &quot;pecking&quot;</div><div class="line">(integer) 1</div><div class="line">&gt; sadd birdpowers &quot;flight&quot;</div><div class="line">(integer) 1</div><div class="line">&gt; smembers birdpowers</div><div class="line">1) &quot;pecking&quot;</div><div class="line">2) &quot;flight&quot;</div><div class="line">&gt; smembers superpowers</div><div class="line">1) &quot;x-ray vision&quot;</div><div class="line">2) &quot;flight&quot;</div><div class="line">&gt; sunion superpowers birdpowers   //无序的 sunion birdpowers superpowers结果一样</div><div class="line">1) &quot;pecking&quot;</div><div class="line">2) &quot;flight&quot;</div><div class="line">3) &quot;x-ray vision&quot;</div></pre></td></tr></table></figure>
-</li>
-</ul>
-<h2 id="sorted-set操作：zadd-zrange"><a href="#sorted-set操作：zadd-zrange" class="headerlink" title="sorted set操作：zadd zrange"></a>sorted set操作：zadd zrange</h2><p>有序集合(sorted set)类似集合，不过它每个元素有一个关联值，通过这个关联值对元素进行排序。</p>
-<ul>
-<li><p>zadd为一个有序集合添加元素</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">&gt; zadd hackers 1940 &quot;Alan Kay&quot;</div><div class="line">(integer) 1</div><div class="line">&gt; zadd hackers 1906 &quot;Grace Hopper&quot;</div><div class="line">(integer) 1</div><div class="line">&gt; zadd hackers 1953 &quot;Richard Stallman&quot;</div><div class="line">(integer) 1</div><div class="line">&gt; zadd hackers 1965 &quot;Yukihiro Matsumoto&quot;</div><div class="line">(integer) 1</div><div class="line">&gt; zadd hackers 1916 &quot;Claude Shannon&quot;</div><div class="line">(integer) 1</div><div class="line">&gt; zadd hackers 1969 &quot;Linus Torvalds&quot;</div><div class="line">(integer) 1</div><div class="line">&gt; zadd hackers 1957 &quot;Sophie Wilson&quot;</div><div class="line">(integer) 1</div><div class="line">&gt; zadd hackers 1912 &quot;Alan Turing&quot;</div><div class="line">(integer) 1</div></pre></td></tr></table></figure>
-</li>
-<li><p>zrange类似于lrange，查看sorted set元素。接受两个参数，开始index和结尾index，如果结尾index为-1，表示直到末尾</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">&gt; zrange hackers 0 -1</div><div class="line">1) &quot;Grace Hopper&quot;</div><div class="line">2) &quot;Alan Turing&quot;</div><div class="line">3) &quot;Claude Shannon&quot;</div><div class="line">4) &quot;Alan Kay&quot;</div><div class="line">5) &quot;Richard Stallman&quot;</div><div class="line">6) &quot;Sophie Wilson&quot;</div><div class="line">7) &quot;Yukihiro Matsumoto&quot;</div><div class="line">8) &quot;Linus Torvalds&quot;</div></pre></td></tr></table></figure>
-</li>
-</ul>
-<p>可以看到元素以年份递增排序。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">&gt; ZRANGE hackers 2 4</div><div class="line">1) &quot;Claude Shannon&quot;</div><div class="line">2) &quot;Alan Kay&quot;</div><div class="line">3) &quot;Richard Stallman&quot;</div></pre></td></tr></table></figure></p>
-<h2 id="hash操作：hset-amp-hget-amp-hgetall-amp-hmset-amp-hincrby-amp-hdel"><a href="#hash操作：hset-amp-hget-amp-hgetall-amp-hmset-amp-hincrby-amp-hdel" class="headerlink" title="hash操作：hset &amp; hget &amp; hgetall &amp; hmset &amp; hincrby &amp; hdel"></a>hash操作：hset &amp; hget &amp; hgetall &amp; hmset &amp; hincrby &amp; hdel</h2><p> hash 是一个string类型的field和value的映射表，hash特别适合用于存储对象。</p>
-<ul>
-<li>hset添加值<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">&gt; hset user name &quot;tenny&quot;</div><div class="line">(integer) 1</div><div class="line">&gt; hset user email &quot;tenny@example.com&quot;</div><div class="line">(integer) 1</div><div class="line">&gt; hset user password &quot;cutepanda&quot;</div><div class="line">(integer) 1</div></pre></td></tr></table></figure>
-</li>
-</ul>
-<ul>
-<li><p>hget获取值</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">&gt; hget user name</div><div class="line">&quot;tenny&quot;</div></pre></td></tr></table></figure>
-</li>
-<li><p>hgetall获取所有值</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">&gt; hgetall user</div><div class="line">1) &quot;name&quot;</div><div class="line">2) &quot;tenny&quot;</div><div class="line">3) &quot;email&quot;</div><div class="line">4) &quot;tenny@example.com&quot;</div><div class="line">5) &quot;password&quot;</div><div class="line">6) &quot;cutepanda&quot;</div></pre></td></tr></table></figure>
-</li>
-<li><p>hmset一次性设置多个值</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">&gt; hmset user1 name &quot;tenny1&quot; password &quot;cutepanda1&quot; email &quot;tenny1@example.com&quot;</div><div class="line">OK</div><div class="line">&gt; hgetall user1</div><div class="line">1) &quot;name&quot;</div><div class="line">2) &quot;tenny1&quot;</div><div class="line">3) &quot;password&quot;</div><div class="line">4) &quot;cutepanda1&quot;</div><div class="line">5) &quot;email&quot;</div><div class="line">6) &quot;tenny1@example.com&quot;</div></pre></td></tr></table></figure>
-</li>
-</ul>
-<p>可以使用hset继续添加或修改<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line">&gt; hset user1 age 22</div><div class="line">(integer) 1</div><div class="line">&gt; hgetall user1</div><div class="line">1) &quot;name&quot;</div><div class="line">2) &quot;tenny1&quot;</div><div class="line">3) &quot;password&quot;</div><div class="line">4) &quot;cutepanda1&quot;</div><div class="line">5) &quot;email&quot;</div><div class="line">6) &quot;tenny1@example.com&quot;</div><div class="line">7) &quot;age&quot;</div><div class="line">8) &quot;22&quot;</div><div class="line">&gt; hset user1 age 24   //已存在的值重复设定返回0，新值返回1</div><div class="line">(integer) 0</div><div class="line">&gt; hgetall user1</div><div class="line">1) &quot;name&quot;</div><div class="line">2) &quot;tenny1&quot;</div><div class="line">3) &quot;password&quot;</div><div class="line">4) &quot;cutepanda1&quot;</div><div class="line">5) &quot;email&quot;</div><div class="line">6) &quot;tenny1@example.com&quot;</div><div class="line">7) &quot;age&quot;</div><div class="line">8) &quot;24&quot;</div></pre></td></tr></table></figure></p>
-<ul>
-<li><p>hincrby增加数值型域的值</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">&gt; hset user visits 10</div><div class="line">(integer) 1</div><div class="line">&gt; hincrby user visits 1</div><div class="line">(integer) 11</div><div class="line">&gt; hincrby user visits 1</div><div class="line">(integer) 12</div></pre></td></tr></table></figure>
-</li>
-<li><p>hdel删除指定的域</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">&gt; hdel user visits</div><div class="line">(integer) 1</div><div class="line">&gt; hdel user age   //删除不存在的域返回0</div><div class="line">(integer) 0</div><div class="line">&gt; hdel user visits</div><div class="line">(integer) 0</div><div class="line">&gt; hincrby user visits 20    //字段不存在则默认设置为0后再执行此增加操作</div><div class="line">(integer) 20</div></pre></td></tr></table></figure>
-</li>
-</ul>
-<font size="5">以上介绍了redis的一些简单命令，可以访问<a href="http://www.redis.cn/commands.html" target="_blank" rel="external">redis中文官方网站</a>了解更多。</font>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="https://tenny-peng.github.io/2017/04/08/HelloWorld/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Tenny Peng">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Tenny's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2017/04/08/HelloWorld/" itemprop="url">
-                  Hello World!
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-04-08T17:34:50+08:00">
-                2017-04-08
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Java学习记录/" itemprop="url" rel="index">
-                    <span itemprop="name">Java学习记录</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="开始动手，Hello-World！！"><a href="#开始动手，Hello-World！！" class="headerlink" title="开始动手，Hello World！！"></a>开始动手，Hello World！！</h1><p>是时候编写你自己的第一个Java应用了。</p>
-<h2 id="下载JDK"><a href="#下载JDK" class="headerlink" title="下载JDK"></a>下载JDK</h2><p>你可以到这里<a href="http://www.oracle.com/technetwork/java/javase/downloads/index.html" target="_blank" rel="external">下载</a>JDK并安装。</p>
-<p>注意：下载的是<strong>JDK</strong>，而<em>不是</em>JRE。JRE是java运行环境，用于运行java程序；JDK是java开发工具包，用于开发java程序，其中包含了JRE，所以我们下载JDK就好。</p>
-<p>安装完成后，win + r 输入cmd，打开命令行窗口，输入”java -version”，看到类似如下结果就说明安装成功了。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">C:\Users\Administrator&gt;java -version</div><div class="line">java version &quot;1.8.0_102&quot;</div><div class="line">Java(TM) SE Runtime Environment (build 1.8.0_102-b14)</div><div class="line">Java HotSpot(TM) 64-Bit Server VM (build 25.102-b14, mixed mode)</div></pre></td></tr></table></figure></p>
-<h2 id="编辑工具"><a href="#编辑工具" class="headerlink" title="编辑工具"></a>编辑工具</h2><p>这里用windows自带的记事本就可以。</p>
-<h2 id="创建源文件"><a href="#创建源文件" class="headerlink" title="创建源文件"></a>创建源文件</h2><p>在D盘新建一个目录myapplication(你也可以自己选择其他盘符及目录)，新建一个记事本文档，将下面代码粘贴或手动输入到文本里：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">/**</div><div class="line"> * The HelloWorldApp class implements an application that</div><div class="line"> * simply prints &quot;Hello World!&quot; to standard output.</div><div class="line"> */</div><div class="line">class HelloWorldApp &#123;</div><div class="line">    public static void main(String[] args) &#123;</div><div class="line">        System.out.println(&quot;Hello World!&quot;); // Display the string.</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<p>注意：Java严格<strong>区分大小写</strong>，HelloWorldApp不等于helloWorldapp。</p>
-<p>将该文件保存为HelloWorldApp.java。</p>
-<h2 id="编译"><a href="#编译" class="headerlink" title="编译"></a>编译</h2><p>win + r，输入cmd，打开命令行窗口，输入<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">cd d:\myapplication</div></pre></td></tr></table></figure></p>
-<p>切换到HelloWorldApp.java文件所在目录。</p>
-<p>切换目录使用如下命令：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">C:\&gt;D:    //切换到D盘根目录</div><div class="line"></div><div class="line">D:\&gt;cd myapplication    //切换到当前目录下的myapplication目录</div><div class="line"></div><div class="line">D:\myapplication&gt;     //完成切换。。</div></pre></td></tr></table></figure></p>
-<p>继续输入:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">javac HelloWorldApp.java</div></pre></td></tr></table></figure></p>
-<p>如果没有任何信息，应该就编译成功了，查看myapplication目录，发现多出一个HelloWorldApp.class文件，这个就是字节码文件。<br>如果出现错误提示，请检查文件名和文件内容是否和上述一致。</p>
-<h2 id="运行"><a href="#运行" class="headerlink" title="运行"></a>运行</h2><p>输入java HelloWorldApp运行程序。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">D:\myapplication&gt;java HelloWorldApp</div><div class="line">Hello World!</div></pre></td></tr></table></figure></p>
-<p>看到打印出了”Hello World!”说明我们得程序运行成功了。<br>如果提示错误，请检查文件名和文件内容是否和上述一致。</p>
-<p>至此，第一个java应用程序就完成了。</p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
   <nav class="pagination">
-    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right"></i></a>
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -2228,7 +2379,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">19</span>
+                <span class="site-state-item-count">23</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -2239,7 +2390,7 @@
             
             <div class="site-state-item site-state-categories">
               <a href="/categories/index.html">
-                <span class="site-state-item-count">12</span>
+                <span class="site-state-item-count">16</span>
                 <span class="site-state-item-name">分类</span>
               </a>
             </div>
@@ -2250,7 +2401,7 @@
             
             <div class="site-state-item site-state-tags">
               <a href="/tags/index.html">
-                <span class="site-state-item-count">16</span>
+                <span class="site-state-item-count">22</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
