@@ -127,20 +127,10 @@ public class EncryptPropertyPlaceholderConfigurer extends PropertyPlaceholderCon
 
     private List<String> encryptPropNames;
 
-    private String keyValue = null;
-
     @Override
     protected void convertProperties(Properties props) {
-        // 1.先遍历全部属性，找到key属性值以初始化AESUtil
-        Enumeration<?> propertyNames = props.propertyNames();
-        while (propertyNames.hasMoreElements()) {
-            String propertyName = (String) propertyNames.nextElement();
-            String propertyValue = props.getProperty(propertyName);
-            if(propertyName.equals("keyValue")){
-                keyValue = propertyValue;
-            }
-        }
-        AESUtil.key = keyValue;
+        // 1.找到key属性值以初始化AESUtil
+        AESUtil.key = props.getProperty("key");
         // 2.回调原遍历方法
         super.convertProperties(props);
     }
@@ -150,7 +140,7 @@ public class EncryptPropertyPlaceholderConfigurer extends PropertyPlaceholderCon
     protected String convertProperty(String propertyName, String propertyValue) {
 
         if (encryptPropNames.contains(propertyName)) {
-            return SecUtil.decrypt(propertyValue);
+            return AESUtil.decrypt(propertyValue);
         }
         return propertyValue;
     }
@@ -161,11 +151,12 @@ public class EncryptPropertyPlaceholderConfigurer extends PropertyPlaceholderCon
 
 }
 ```
-如此一来的话，就解决了解密属性要AESUtil而AESUtil要key属性的"死锁"问题。
+其中的props.getProperty(String)方法可以根据键直接获取对应值
+![getProperty方法](spring项目properties属性加密解密处理/20171226114655.png)
+
+核心思路还是先拿到key，再处理其他属性。如此一来，就解决了解密属性要AESUtil而AESUtil要key属性的"死锁"问题。
 
 ### 总结
 一般来说，大部分情况下解决方案1.0足矣。
 
-不过我这里比较特别一点，场景稍微有点麻烦。先是折腾了半天想办法如何按写入顺序读出属性，但是感觉把事情搞得更麻烦了，又得引入新的东西，最后还是放弃了这种方案。后来在上级老大的提示下尝试重写convertProperty更上层的convertProperties方法，于是对数据有了更强的掌控力，问题也解决了。
-
-当然缺点还是有的，第一次遍历了所有属性只是为了拿特定的一个属性，而后面又要全部遍历一次，感觉有点浪费吖。嘛，暂时先这样了。后面有啥好办法再修改咯。
+不过我这里比较特别一点，场景稍微有点麻烦。先是折腾了半天想办法如何按写入顺序读出属性，但是感觉把事情搞得更麻烦了，又得引入新的东西，最后还是放弃了这种方案。后来在上级老大的提示下尝试重写convertProperty更上层的convertProperties方法，结合Properties.getProperty(String key)方法，对数据有了更灵活的控制，问题也就解决了。
