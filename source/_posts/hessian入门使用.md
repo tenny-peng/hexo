@@ -486,3 +486,7 @@ Hessian是caucho公司开发的一种基于二进制RPC协议（Remote Procedure
 ## 运行
 分别启动服务端（端口为8080）和客户端（端口为8081）项目，浏览器地址访问   http://localhost:8081/SpringHessianClient/hello/sayHello 就能看到结果了。
 其中页面显示`hello tenny`，服务端控制台打印`service result: hello tenny`，客户端控制台打印`client result: hello tenny`。
+
+## 附件
+SpringHessianService项目下载：https://github.com/tenny-peng/SpringHessianService  
+SpringHessianClient项目下载：https://github.com/tenny-peng/SpringHessianClient
