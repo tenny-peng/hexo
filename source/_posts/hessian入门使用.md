@@ -185,3 +185,304 @@ Hessian是caucho公司开发的一种基于二进制RPC协议（Remote Procedure
 
 ## 说明
 这里服务端和客户端都编写了同样的接口和基础类，只是为了演示简单例子。在实际使用中，应该是服务端将自己的接口及所需类打成jar包给客户端引入调用。
+
+# Spring整合Hessian
+
+## 服务端项目
+1. 新建一个Maven项目，编辑pom.xml
+    ```
+    <project xmlns="http://maven.apache.org/POM/4.0.0" 
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
+                             http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.tenny</groupId>
+    <artifactId>SpringHessianService</artifactId>
+    <packaging>war</packaging>
+    <version>0.0.1-SNAPSHOT</version>
+    <name>SpringHessianService Maven Webapp</name>
+    <url>http://maven.apache.org</url>
+    <dependencies>
+        <dependency>
+        <groupId>junit</groupId>
+        <artifactId>junit</artifactId>
+        <version>4.12</version>
+        <scope>test</scope>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-webmvc</artifactId>
+            <version>4.3.16.RELEASE</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>com.caucho</groupId>
+            <artifactId>hessian</artifactId>
+            <version>4.0.7</version>
+        </dependency>
+        
+    </dependencies>
+    <build>
+        <finalName>SpringHessianService</finalName>
+        <plugins>  
+            <plugin>  
+                <groupId>org.apache.maven.plugins</groupId>  
+                <artifactId>maven-compiler-plugin</artifactId> 
+                <version>3.1</version>
+                <configuration>  
+                    <source>1.8</source>  
+                    <target>1.8</target>
+                    <encoding>UTF-8</encoding>
+                </configuration>  
+            </plugin>  
+        </plugins>
+    </build>
+    </project>
+    ```
+
+2. 编辑web.xml
+    ```
+    <?xml version="1.0" encoding="UTF-8"?>  
+    <web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"  
+            xmlns="http://java.sun.com/xml/ns/javaee"  
+            xsi:schemaLocation="http://java.sun.com/xml/ns/javaee 
+                                http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"  
+            version="3.0">
+
+    <display-name>Spring Hessian Service</display-name>
+    
+    <servlet>
+            <servlet-name>HessianServlet</servlet-name>
+            <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+            <init-param>
+                <param-name>contextConfigLocation</param-name>
+                <param-value>classpath:hessian-server.xml</param-value>
+            </init-param>
+            <load-on-startup>1</load-on-startup>
+        </servlet>
+        <servlet-mapping>
+            <servlet-name>HessianServlet</servlet-name>
+            <url-pattern>/</url-pattern>
+        </servlet-mapping>
+    
+    </web-app>
+    ```
+
+3. 编辑hessian-server.xml
+    ```
+    <?xml version="1.0" encoding="UTF-8"?>
+    <beans xmlns="http://www.springframework.org/schema/beans"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+        xmlns:mvc="http://www.springframework.org/schema/mvc"
+        xmlns:context="http://www.springframework.org/schema/context"
+        xsi:schemaLocation="http://www.springframework.org/schema/mvc 
+                            http://www.springframework.org/schema/mvc/spring-mvc.xsd
+                            http://www.springframework.org/schema/beans 
+                            http://www.springframework.org/schema/beans/spring-beans.xsd
+                            http://www.springframework.org/schema/context 
+                            http://www.springframework.org/schema/context/spring-context.xsd">
+
+        <context:component-scan base-package="com.tenny" />
+
+        <bean name="/hello" class="org.springframework.remoting.caucho.HessianServiceExporter">
+            <property name="service" ref="helloImpl" />
+            <property name="serviceInterface" value="com.tenny.IHello" />
+        </bean>
+
+    </beans>
+    ```
+
+4. 接口代码
+    ```
+    package com.tenny;
+
+    /**
+    * @author tenny
+    *
+    */
+    public interface IHello {
+        
+        public String hello(String name);
+
+    }
+    ```
+
+5. 接口实现代码
+    ```
+    package com.tenny;
+
+    import org.springframework.stereotype.Service;
+
+    /**
+    * @author tenny
+    *
+    */
+    @Service
+    public class HelloImpl implements IHello {
+
+        @Override
+        public String hello(String name) {
+            String result = "hello " + name;
+            System.out.println("service result: " + result);
+            return result;
+        }
+
+    }
+    ```
+
+## 客户端项目
+1. 新建Maven工程，编辑pom.xml
+    ```
+    <project xmlns="http://maven.apache.org/POM/4.0.0" 
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
+                             http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.tenny</groupId>
+    <artifactId>SpringHessianClient</artifactId>
+    <packaging>war</packaging>
+    <version>0.0.1-SNAPSHOT</version>
+    <name>SpringHessianClient Maven Webapp</name>
+    <url>http://maven.apache.org</url>
+    <dependencies>
+        <dependency>
+        <groupId>junit</groupId>
+        <artifactId>junit</artifactId>
+        <version>4.12</version>
+        <scope>test</scope>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-webmvc</artifactId>
+            <version>4.3.16.RELEASE</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>com.caucho</groupId>
+            <artifactId>hessian</artifactId>
+            <version>4.0.7</version>
+        </dependency>
+        
+    </dependencies>
+    <build>
+        <finalName>SpringHessianClient</finalName>
+        <plugins>  
+            <plugin>  
+                <groupId>org.apache.maven.plugins</groupId>  
+                <artifactId>maven-compiler-plugin</artifactId> 
+                <version>3.1</version>
+                <configuration>  
+                    <source>1.8</source>  
+                    <target>1.8</target>
+                    <encoding>UTF-8</encoding>
+                </configuration>  
+            </plugin>  
+        </plugins>
+    </build>
+    </project>
+    ```
+
+2. 编辑web.xml
+    ```
+    <?xml version="1.0" encoding="UTF-8"?>  
+    <web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"  
+            xmlns="http://java.sun.com/xml/ns/javaee"  
+            xsi:schemaLocation="http://java.sun.com/xml/ns/javaee 
+                                http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"  
+            version="3.0">
+        
+    <display-name>Spring Hessian Client</display-name>
+    
+    <servlet>
+            <servlet-name>HessianClient</servlet-name>
+            <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+            <init-param>
+                <param-name>contextConfigLocation</param-name>
+                <param-value>classpath:hessian-client.xml</param-value>
+            </init-param>
+            <load-on-startup>1</load-on-startup>
+        </servlet>
+        <servlet-mapping>
+            <servlet-name>HessianClient</servlet-name>
+            <url-pattern>/</url-pattern>
+        </servlet-mapping>
+    
+    </web-app>
+    ```
+
+3. 编辑hessian-client.xml
+    ```
+    <?xml version="1.0" encoding="UTF-8"?>
+    <beans xmlns="http://www.springframework.org/schema/beans"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+        xmlns:mvc="http://www.springframework.org/schema/mvc"
+        xmlns:context="http://www.springframework.org/schema/context"
+        xsi:schemaLocation="http://www.springframework.org/schema/mvc 
+                            http://www.springframework.org/schema/mvc/spring-mvc.xsd
+                            http://www.springframework.org/schema/beans 
+                            http://www.springframework.org/schema/beans/spring-beans.xsd
+                            http://www.springframework.org/schema/context 
+                            http://www.springframework.org/schema/context/spring-context.xsd">
+
+        <mvc:annotation-driven  />
+
+        <context:component-scan base-package="com.tenny" />
+
+        <bean id="hello" class="org.springframework.remoting.caucho.HessianProxyFactoryBean">
+            <property name="serviceUrl" value="http://localhost:8080/SpringHessianService/hello"></property>
+            <property name="serviceInterface" value="com.tenny.IHello"></property>
+        </bean>
+
+    </beans>
+    ```
+
+4. 接口代码（实际项目中引入服务端的接口jar包）
+    ```
+    package com.tenny;
+
+    /**
+    * @author tenny
+    *
+    */
+    public interface IHello {
+        
+        public String hello(String name);
+
+    }
+    ```
+
+5. Controller代码
+    ```
+    package com.tenny;
+
+    import org.springframework.beans.factory.annotation.Autowired;
+    import org.springframework.web.bind.annotation.RequestMapping;
+    import org.springframework.web.bind.annotation.RequestMethod;
+    import org.springframework.web.bind.annotation.RestController;
+
+    /**
+    * @author tenny
+    *
+    */
+    @RestController
+    @RequestMapping("/hello")
+    public class HelloController {
+
+        @Autowired
+        private IHello helloHess;
+        
+        @RequestMapping(value = "/sayHello", method=RequestMethod.GET)
+        public String sayHello(){
+            String result =  helloHess.hello("tenny");
+            System.out.println("client result: " + result);
+            return result;
+        }
+        
+    }
+    ```
+
+## 运行
+分别启动服务端（端口为8080）和客户端（端口为8081）项目，浏览器地址访问   http://localhost:8081/SpringHessianClient/hello/sayHello 就能看到结果了。
+其中页面显示`hello tenny`，服务端控制台打印`service result: hello tenny`，客户端控制台打印`client result: hello tenny`。
