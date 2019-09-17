@@ -77,7 +77,7 @@ An email <example@example.com> link.
 [id]: /url/to/img.jpg "Title"
 
 使用id引用图片链接![图片替代文字][img_id]
-[img_id](https://tenny-peng.github.io/images/avatar.jpg "偷得浮生半日闲")
+[img_id]: https://tenny-peng.github.io/images/avatar.jpg "偷得浮生半日闲"
 ```
 效果如下：
 
